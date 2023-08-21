@@ -1,0 +1,12 @@
+{
+  "mnemonic": "gather inherit burst vault sun belt gift bamboo recall green merit transfer",
+  "seed": "ea3dcaab433ebe1cd52823ab6eb0aa7a172187c0f7fd22463aff1540867b639365afcf0f0c61c8f4842fa8dafbd4dc20f059a9b51fcee0a92e53303eef526f91",
+  "uint8seed": [82,  74, 179,  56, 134, 226,  42,  15, 252, 225, 198,
+  12, 195, 186,   2, 110, 215, 183,  56,  86, 235, 209,
+ 170, 119,  37,  79, 194,  65, 154,  75,  45,  43,  86,
+ 133, 200, 199,  88, 124, 234, 208, 212, 129,  85,  11,
+ 237,  54, 179, 241, 157, 203, 219, 188,  66, 206, 142,
+   4, 181, 142, 237, 136,  18, 174, 223, 193],
+  "pvtkey": "e62d939ac2377314e9373595516ab996583eea85d0b3e03f6d56de938d223cb9",
+  "pubkey": "02bc65f401d268dbee7d6d7ec45e6b599c963da833d58ef199dc4ab2bf9e4066d7"
+}
