@@ -28,7 +28,9 @@ export const getDepositSoluctionBatch = async ({
     receiverPubkey = BigInt(receiverPubkey)
   }
 
-  const tokenHash = Pact.crypto.hash(JSON.stringify(selectedToken))
+  const blakeHash = Pact.crypto.hash(`${selectedToken.id as string},${selectedToken.refName.name as string},${selectedToken.refName.namespace as string},${selectedToken.refSpec.name as string},${selectedToken.refSpec.namespace as string}`)
+
+  const tokenHash = Pact.crypto.hash(blakeHash)
 
   const token = poseidon([base64urlToBigInt(tokenHash)])
 

@@ -123,7 +123,7 @@ export const getSolutionBatch = async ({
   const removedZeroUTXOs = filterZeroUTXOs(treeBalance.utxos);
 
   const filteredUTXOs = removedZeroUTXOs.filter(
-    (utxo) => !excludedUTXOIDPositions.includes(getUTXOIDPosition(utxo) && utxo.token.toString() === treeBalance.token),
+    (utxo) => !excludedUTXOIDPositions.includes(getUTXOIDPosition(utxo)),
   );
 
   if (!filteredUTXOs.length) {
