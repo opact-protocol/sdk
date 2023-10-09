@@ -1,28 +1,42 @@
-import { assert, expect } from 'chai';
 import { getUtxo } from '../utxo';
+import fetchMock from 'fetch-mock';
+import { assert, expect, use } from 'chai';
+// @ts-expect-error
+import chaiFetchMock from 'chai-fetch-mock';
 import { computeProof } from '../../proof';
 import { isDefined } from '../../util/is-defined';
 import { MerkleTree } from '../../merkletree/merkletree';
 import { PROOF_LENGTH } from '../../constants/proof';
-import { generateMnemonic, getHDWalletFromMnemonic } from '../../keys';
 import { getDepositSoluctionBatch, getSolutionBatch, getSolutionOuts, getTransferSolutionBatch, filterZeroUTXOs } from '../../batch';
 
 const token = 832719810210204902983213847411017819246076070166n
 
 const baseUtxos = [0n, 30n, 40n, 50n, 10n, 20n, 10n, 20n, 0n]
 
+const wallet = {
+  pvtkey: 1482393132684423265528213543145697981060187089163992385907820405516567711584n,
+  pubkey: 11266420894616539307519683389038109246654130435849311470670815520318096498921n,
+}
+
+const utxos = [
+  ...baseUtxos.map((amount) => getUtxo({ amount, token, pubkey: wallet.pubkey }))
+]
+
+const commitments = utxos.map(utxo => ({ value: utxo.hash.toString() }))
+
+use(chaiFetchMock);
+
 describe('Transaction tests', function test() {
   this.timeout(120000);
 
+  this.beforeAll(() => {
+    fetchMock.get('https://bpsd19dro1.execute-api.us-east-2.amazonaws.com/commitments', {
+      data: commitments,
+      is_last_page: true
+    })
+  })
+
   it('Should create a solution batch of UTXOs', async () => {
-    const mnemonic = generateMnemonic()
-
-    const wallet = await getHDWalletFromMnemonic(mnemonic)
-
-    const utxos = [
-      ...baseUtxos.map((amount) => getUtxo({ amount, token, pubkey: wallet.pubkey }))
-    ]
-
     const tree = await MerkleTree.build(PROOF_LENGTH + 1);
 
     tree.pushMany(utxos.map((utxo: any) => utxo.hash));
@@ -81,16 +95,6 @@ describe('Transaction tests', function test() {
   });
 
   it('The code must be create a valid withdraw transaction', async () => {
-    const mnemonic = generateMnemonic()
-
-    const wallet = await getHDWalletFromMnemonic(mnemonic)
-
-    const utxos = [
-      ...(await Promise.all(baseUtxos.map(async (amount) => await getUtxo({ amount, token, pubkey: wallet.pubkey }))))
-    ]
-
-    const commitments = utxos.map(utxo => ({ value: utxo.hash }))
-
     const treeBalance = {
       token,
       utxos,
@@ -98,7 +102,6 @@ describe('Transaction tests', function test() {
     }
 
     const batch = await getTransferSolutionBatch({
-      commitments,
       treeBalance,
       totalRequired: 66n,
       senderWallet: wallet,
@@ -112,16 +115,6 @@ describe('Transaction tests', function test() {
   })
 
   it('The code must be create a valid deposit transaction', async () => {
-    const mnemonic = generateMnemonic()
-
-    const wallet = await getHDWalletFromMnemonic(mnemonic)
-
-    const utxos = [
-      ...(await Promise.all(baseUtxos.map(async (amount) => await getUtxo({ amount, token, pubkey: wallet.pubkey }))))
-    ]
-
-    const commitments = utxos.map(utxo => ({ value: utxo.hash }))
-
     const treeBalance = {
       token,
       utxos,
@@ -129,7 +122,6 @@ describe('Transaction tests', function test() {
     }
 
     const batch = await getDepositSoluctionBatch({
-      commitments,
       treeBalance,
       totalRequired: 15n,
       senderWallet: wallet,

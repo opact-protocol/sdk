@@ -6,15 +6,16 @@ const EXPECTED_VALUE = 119542556770487675857309595295929396152623101911508537758
 
 export const computeTreeValues = async (
   utxosIn: any,
-  commitments: any[],
   isDeposit = false
 ) => {
-  const tree = await (new MerkleTreeService()).initMerkleTree(
+  const {
+    tree,
+    branches,
+  } = await (new MerkleTreeService()).initMerkleTree(
     [
       0,
       0,
       0,
-      ...commitments.map((comm: any) => BigInt(comm.value))
     ]
   )
 
@@ -55,7 +56,7 @@ export const computeTreeValues = async (
   subtree.pushMany(sparseTreeComitments)
 
   newIns = newIns.map((utxo: any, i: any) => {
-    const { order } = commitments.find(({ value }: any) => BigInt(value) === utxo.hash) || {}
+    const { order } = branches.find(({ value }: any) => BigInt(value) === utxo.hash) || {}
 
     if (order && !isDeposit) {
       return {

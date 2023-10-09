@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import MerkleTree, { MerkleTree as FixedMerkleTree } from "fixed-merkle-tree";
 import { PoseidonClass } from "./hash";
@@ -5,16 +6,31 @@ import { PoseidonClass } from "./hash";
 export class MerkleTreeService {
   readonly name: string;
 
+  RPC: string;
+
   tree: any | undefined;
 
+  branches: any = []
+
   constructor(
-    name = 'foooooo',
+    name = 'commitments',
   ) {
     this.name = name;
+    this.RPC = 'https://bpsd19dro1.execute-api.us-east-2.amazonaws.com'
   }
 
-  async initMerkleTree(items: any, baseElements: any[] = []): Promise<MerkleTree> {
+  async initMerkleTree(localItems: any[], baseElements: any[] = [], onlyLocal = false): Promise<any> {
     const { hash } = await (new PoseidonClass()).load();
+
+    const branches = await this.getBranches();
+
+    let items: any[] = [...localItems];
+
+    if (!onlyLocal) {
+      items = [...items, ...branches.map(({ value }: any) => BigInt(value))]
+    }
+
+    this.branches = branches
 
     const tree = new FixedMerkleTree(32, baseElements,
       {
@@ -43,6 +59,30 @@ export class MerkleTreeService {
 
     this.tree = tree;
 
-    return tree;
+    return {
+      tree,
+      branches,
+    };
+  }
+
+  async getBranches(): Promise<any> {
+    let branches: any[] = []
+
+    let isLastPage = false
+
+    while (!isLastPage) {
+      const response = await fetch(`${this.RPC}/commitments`)
+
+      const {
+        data,
+        is_last_page
+      } = await response.json()
+
+      branches = [...branches, ...data]
+
+      isLastPage = is_last_page
+    }
+
+    return branches
   }
 }

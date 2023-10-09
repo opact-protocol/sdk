@@ -7,7 +7,6 @@ import { computeTreeValues } from '../proof/tree-values'
 import { getDelta, getSolutionOuts } from "./solutions"
 
 export const getDepositSoluctionBatch = async ({
-  commitments,
   treeBalance,
   senderWallet,
   totalRequired,
@@ -75,7 +74,7 @@ export const getDepositSoluctionBatch = async ({
   const {
     roots,
     newIns
-  } = await computeTreeValues(utxosIn, commitments)
+  } = await computeTreeValues(utxosIn)
 
   return {
     delta,

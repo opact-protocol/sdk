@@ -3,10 +3,9 @@ import Pact from 'pact-lang-api'
 import { poseidon } from "circomlibjs"
 import { base64urlToBigInt } from "../util"
 import { computeTreeValues } from '../proof/tree-values'
-import { getDelta, getSolutionBatch, getSolutionOuts } from "./solutions"
+import { getDelta, getSolutionBatch, getSolutionBatchForNFT, getSolutionOuts } from "./solutions"
 
 export const getTransferSolutionBatch = async ({
-  commitments,
   treeBalance,
   senderWallet,
   totalRequired,
@@ -61,7 +60,60 @@ export const getTransferSolutionBatch = async ({
   const {
     roots,
     newIns
-  } = await computeTreeValues(utxosIn, commitments)
+  } = await computeTreeValues(utxosIn)
+
+  return {
+    delta,
+    roots,
+    token,
+    utxosOut,
+    utxosIn: newIns,
+  }
+}
+
+export const getTransferSolutionBatchForNft = async ({
+  treeBalance,
+  senderWallet,
+  selectedToken,
+  totalRequired,
+  receiverPubkey,
+}: any) => {
+  if (receiverPubkey) {
+    receiverPubkey = BigInt(receiverPubkey)
+  }
+
+  const blakeHash = Pact.crypto.hash(`${selectedToken.id as string},${selectedToken.refName.name as string},${selectedToken.refName.namespace as string},${selectedToken.refSpec.name as string},${selectedToken.refSpec.namespace as string}`)
+
+  const tokenHash = Pact.crypto.hash(blakeHash)
+
+  const token = poseidon([base64urlToBigInt(tokenHash)])
+
+  const utxosIn = await getSolutionBatchForNFT({
+    treeBalance: {
+      ...treeBalance,
+      token,
+    },
+    pubkey: senderWallet.pubkey,
+  })
+
+  const utxosOut = await getSolutionOuts({
+    utxosIn,
+    treeBalance: {
+      ...treeBalance,
+      token,
+    },
+    selectedToken,
+    totalRequired,
+    receiverPubkey,
+    senderPubkey: senderWallet.pubkey,
+  })
+
+  const delta = await getDelta({ utxosOut, utxosIn })
+
+  const {
+    roots,
+    newIns
+  } = await computeTreeValues(utxosIn)
 
   return {
     delta,

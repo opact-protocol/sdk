@@ -63,7 +63,13 @@ const decryptRaw = (
 ): Plaintext => {
   const plaintext: Plaintext = ciphertext.data.map(
     (e: bigint, i: number): bigint => {
-      return BigInt(e) - BigInt(mimc7.hash(sharedKey, BigInt(ciphertext.iv) + BigInt(i)))
+      const value = BigInt(e) - BigInt(mimc7.hash(sharedKey, BigInt(ciphertext.iv) + BigInt(i)))
+
+      if (value < BigInt(0)) {
+        throw new Error('Invalid ciphertext')
+      }
+
+      return value
     }
   )
 

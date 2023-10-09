@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 // TODO FIX ESLINT FOR ALL VALUES
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable no-param-reassign */
@@ -8,9 +9,90 @@
 import { getNullifier } from "../utxo"
 import { decrypt, getUtxoFromDecrypted } from "../encryption"
 
-const RPC = process.env.NODE_ENV !== 'development'
-  ? 'https://bpsd19dro1.execute-api.us-east-2.amazonaws.com/getdata'
-  : 'http://ec2-34-235-122-42.compute-1.amazonaws.com:5000/getdata'
+const RPC = 'https://bpsd19dro1.execute-api.us-east-2.amazonaws.com'
+
+export const getUserBalanceBySecret = async (secret: any) => {
+  let isLastPage = false
+
+  let encrypted: any[] = []
+
+  while (!isLastPage) {
+    const response = await fetch(`${RPC}/encrypted`)
+
+    const {
+      data,
+      is_last_page
+    } = await response.json()
+
+    encrypted = [...encrypted, ...data]
+
+    isLastPage = is_last_page
+  }
+
+  let nullifierIsLastPage = false
+
+  let nullifiers: any[] = []
+
+  while (!nullifierIsLastPage) {
+    const response = await fetch(`${RPC}/nullifiers`)
+
+    const {
+      data,
+      is_last_page
+    } = await response.json()
+
+    nullifiers = [...nullifiers, ...data]
+
+    nullifierIsLastPage = is_last_page
+  }
+
+  encrypted = encrypted.map((item: any) => {
+    try {
+      const value = getUtxoFromDecrypted(decrypt(
+        item,
+        secret,
+      ))
+
+      return value
+    } catch (e) {
+      return null
+    }
+  }).filter(item => !!item)
+
+  return groupUtxoByToken(encrypted, nullifiers, secret)
+}
+
+export const getUserReceiptsBySecret = async (secret: any) => {
+  let isLastPage = false
+
+  let receipts: any[] = []
+
+  while (!isLastPage) {
+    const response = await fetch(`${RPC}/receipts`)
+
+    const {
+      data,
+      is_last_page
+    } = await response.json()
+
+    receipts = [...receipts, ...data]
+
+    isLastPage = is_last_page
+  }
+
+  return receipts.map((receipt: any) => {
+    try {
+      const value = getUtxoFromDecrypted(decrypt(
+        receipt,
+        secret,
+      ))
+
+      return value
+    } catch (e) {
+      return null
+    }
+  }).filter(item => !!item)
+}
 
 export const computeLocalTestnet = async (secret: any) => {
   const response = await fetch(`${RPC}?salt=268`)
