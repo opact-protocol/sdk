@@ -1,7 +1,4 @@
-// @ts-expect-error
-import Pact from 'pact-lang-api'
-import { poseidon } from "circomlibjs"
-import { base64urlToBigInt } from "../util"
+import { getPoseidonTokenHash } from "../util"
 import { computeTreeValues } from '../proof/tree-values'
 import { getDelta, getSolutionBatch, getSolutionBatchForNFT, getSolutionOuts } from "./solutions"
 
@@ -27,11 +24,7 @@ export const getTransferSolutionBatch = async ({
     receiverPubkey = BigInt(receiverPubkey)
   }
 
-  const blakeHash = Pact.crypto.hash(`${selectedToken.id as string},${selectedToken.refName.name as string},${selectedToken.refName.namespace as string},${selectedToken.refSpec.name as string},${selectedToken.refSpec.namespace as string}`)
-
-  const tokenHash = Pact.crypto.hash(blakeHash)
-
-  const token = poseidon([base64urlToBigInt(tokenHash)])
+  const token = getPoseidonTokenHash(selectedToken)
 
   const utxosIn = await getSolutionBatch({
     treeBalance: {
@@ -82,11 +75,7 @@ export const getTransferSolutionBatchForNft = async ({
     receiverPubkey = BigInt(receiverPubkey)
   }
 
-  const blakeHash = Pact.crypto.hash(`${selectedToken.id as string},${selectedToken.refName.name as string},${selectedToken.refName.namespace as string},${selectedToken.refSpec.name as string},${selectedToken.refSpec.namespace as string}`)
-
-  const tokenHash = Pact.crypto.hash(blakeHash)
-
-  const token = poseidon([base64urlToBigInt(tokenHash)])
+  const token = getPoseidonTokenHash(selectedToken)
 
   const utxosIn = await getSolutionBatchForNFT({
     treeBalance: {

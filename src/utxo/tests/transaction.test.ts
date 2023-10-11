@@ -125,6 +125,17 @@ describe('Transaction tests', function test() {
       treeBalance,
       totalRequired: 15n,
       senderWallet: wallet,
+      selectedToken: {
+        id: '',
+        refName: {
+          name: 'coin',
+          namespace: ''
+        },
+        refSpec: {
+          name: 'fungible-v2',
+          namespace: ''
+        }
+      }
     })
 
     const proof = computeProof({
