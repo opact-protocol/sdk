@@ -15,3 +15,11 @@ export const base64urlToBigInt = (base64url: string) => {
 
   return bigint
 }
+
+const isPrefixedK = (str: string): boolean => str.startsWith('K:');
+
+const isPrefixedOZK = (str: string): boolean => str.startsWith('OZK');
+
+export const stripK = (str: string): string => (isPrefixedK(str) ? str.slice(2) : str);
+
+export const stripOZK = (str: string): string => (isPrefixedOZK(str) ? str.slice(3) : str);

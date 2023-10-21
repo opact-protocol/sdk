@@ -1,6 +1,6 @@
 {
   "name": "opact-sdk",
-  "version": "1.0.72",
+  "version": "1.0.74",
   "description": "Opact Protocol SDK to integrate with Opact Ecosystem",
   "author": "OPACT core Contributors",
   "license": "MIT",

@@ -2,7 +2,7 @@
 import { encode } from 'js-base64'
 import { encryptRaw, genEcdhSharedKey } from './utils';
 import { textToBigint } from 'bigint-conversion'
-import { generateMnemonic, getHDWalletFromMnemonic } from '../keys';
+import { generateMnemonic, getHDWalletFromMnemonic, validatePubkey } from '../keys';
 import { babyjub } from 'circomlibjs';
 
 export function splitIntoChunks(str: any, chunkSize: any) {
@@ -80,7 +80,7 @@ export const encrypt = (
 
   ciphertext.data = ciphertext.data.map((num: bigint) => num.toString())
 
-  ciphertext.data = [...ephemeral.rawBig.map((value: bigint) => value.toString()), ...ciphertext.data]
+  ciphertext.data = [...ephemeral.points.map((value: bigint) => value.toString()), ...ciphertext.data]
 
   return encode(JSON.stringify({
     ciphertext,
