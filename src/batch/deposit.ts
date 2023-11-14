@@ -1,69 +1,54 @@
 import { getUtxo } from '../utxo'
-import { getPoseidonTokenHash } from '../util'
-import { computeTreeValues } from '../proof/tree-values'
 import { getDelta, getSolutionOuts } from "./solutions"
+import { deriveBabyJubKeysFromEth } from '../keys'
 
 export const getDepositSoluctionBatch = async ({
-  treeBalance,
   senderWallet,
   totalRequired,
   selectedToken,
   receiverPubkey,
+  receipts = [],
 }: any) => {
-  if (receiverPubkey) {
-    receiverPubkey = BigInt(receiverPubkey)
-  }
-
-  const token = getPoseidonTokenHash(selectedToken)
+  const derivedKeys = deriveBabyJubKeysFromEth(senderWallet)
 
   const utxosIn =  [
     getUtxo({
-      token,
       amount: 0n,
       id: selectedToken.id,
-      pubkey: senderWallet.pubkey,
-      address: selectedToken.refName,
+      token: selectedToken.hash,
+      pubkey: derivedKeys.pubkey,
+      address: selectedToken.address,
     }),
     getUtxo({
-      token,
       amount: 0n,
       id: selectedToken.id,
-      pubkey: senderWallet.pubkey,
-      address: selectedToken.refName,
+      token: selectedToken.hash,
+      pubkey: derivedKeys.pubkey,
+      address: selectedToken.address,
     }),
     getUtxo({
-      token,
       amount: 0n,
       id: selectedToken.id,
-      pubkey: senderWallet.pubkey,
-      address: selectedToken.refName,
+      token: selectedToken.hash,
+      pubkey: derivedKeys.pubkey,
+      address: selectedToken.address,
     }),
   ]
 
   const utxosOut = await getSolutionOuts({
     utxosIn,
-    treeBalance: {
-      ...treeBalance,
-      token,
-    },
+    receipts,
     totalRequired,
     selectedToken,
-    senderPubkey: receiverPubkey || senderWallet.pubkey,
     isDeposit: true,
+    senderPubkey: receiverPubkey || derivedKeys.pubkey,
   })
 
   const delta = await getDelta({ utxosOut, utxosIn })
 
-  const {
-    roots,
-    newIns
-  } = await computeTreeValues(utxosIn)
-
   return {
     delta,
-    roots,
-    token,
+    utxosIn,
     utxosOut,
-    utxosIn: newIns,
   }
 }

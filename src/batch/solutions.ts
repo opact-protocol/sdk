@@ -27,12 +27,12 @@ export const getDelta = async ({ utxosIn, utxosOut }: any) => {
 
 export const getSolutionOuts = async ({
   utxosIn,
-  treeBalance,
   senderPubkey,
   totalRequired,
   selectedToken,
   receiverPubkey,
-  isDeposit = false
+  isDeposit = false,
+  receipts = []
 }: any): Promise<any> => {
   if (typeof totalRequired !== 'bigint') {
     totalRequired = BigInt(formatInteger(totalRequired, 12))
@@ -49,22 +49,25 @@ export const getSolutionOuts = async ({
       amount,
       id: selectedToken.id,
       pubkey: senderPubkey,
-      token: treeBalance.token,
-      address: selectedToken.refName,
+      token: selectedToken.hash,
+      address: selectedToken.address,
+      receipt: receipts[0]
     }),
     receiverPubkey
       ? getUtxo({
           id: selectedToken.id,
           amount: totalRequired,
           pubkey: receiverPubkey,
-          token: treeBalance.token,
-          address: selectedToken.refName,
+          token: selectedToken.hash,
+          address: selectedToken.address,
+          receipt: receipts[1]
         })
       : getUtxo({
-        pubkey: senderPubkey,
+        amount: 0,
         id: selectedToken.id,
-        token: treeBalance.token,
-        address: selectedToken.refName,
+        pubkey: senderPubkey,
+        token: selectedToken.hash,
+        address: selectedToken.address,
       })
   ]
 }
@@ -148,7 +151,14 @@ export const getSolutionBatch = async ({
   const exactMatch = filteredUTXOs.find((utxo) => BigInt(utxo.amount) >= totalRequired);
 
   if (exactMatch) {
-    return [exactMatch, getUtxo({ token: treeBalance.token, pubkey }), getUtxo({ token: treeBalance.token, pubkey })]
+    return [exactMatch, getUtxo({
+      pubkey,
+      token: treeBalance.token,
+     }),
+     getUtxo({
+      pubkey,
+      token: treeBalance.token,
+    })]
   }
 
   // Sort UTXOs by smallest size

@@ -1,23 +1,51 @@
-/* eslint-disable */
-// @ts-ignore
 import { poseidon } from 'circomlibjs'
-import { TXO } from './types/utxo.type';
 import { toHex } from 'ethereum-cryptography/utils';
 import { getRandomBytesSync } from 'ethereum-cryptography/random';
+import { TXO } from './types/utxo.type';
+import { encrypt } from '../encryption';
+import { separateHex } from '../util/hex';
+
+export const getRandomBlinding = () => BigInt(`0x${toHex(getRandomBytesSync(32))}`)
+
+export const ownerCommit = ({ pubkey, blinding }: any) => poseidon([pubkey, blinding]);
+
+export const getNullifier = ({ utxo, secret }: any) => poseidon([secret, utxoHash(utxo)])
+
+export const inUtxoInputs = ({ token, amount, blinding }: any) => [token, amount, blinding];
+
+export const utxoHash = ({ token, amount, pubkey, blinding }: TXO) => outUtxoInputs({ token, amount, pubkey, blinding })
+
+export const outUtxoInputs = ({ token, amount, pubkey, blinding }: any) => poseidon([token, amount, ownerCommit({pubkey, blinding})]);
+
+export const objUtxoInputs = ({ token, amount, pubkey, blinding }: any) => ({
+  token,
+  amount,
+  owner_commit: ownerCommit({ pubkey, blinding }),
+})
+
+export const outUtxoInputsNoHashed = ({ blinding, token, amount, pubkey }: any) => {
+  const owner = ownerCommit({
+    blinding,
+    pubkey,
+  })
+
+  return [BigInt(token), BigInt(amount), BigInt(owner)]
+}
 
 export const getUtxo = ({
   token,
   pubkey,
-  id = "0",
+  id = 0,
   amount = 0n,
+  receipt = null,
   address = 'coin',
 }: any): any => {
-  const blinding = BigInt(`0x${toHex(getRandomBytesSync(32))}`)
+  const blinding = getRandomBlinding()
 
   const core =  {
-    token,
     amount,
     blinding,
+    token: BigInt(token),
     pubkey: BigInt(pubkey),
   }
 
@@ -27,31 +55,28 @@ export const getUtxo = ({
     id,
     hash,
     address,
+    receipt,
     ...core
   };
 };
 
-export const objUtxoInputs = ({ token, amount, pubkey, blinding }: any) => ({
-  token,
-  amount,
-  owner_commit: ownerCommit({ pubkey, blinding }),
-})
+export const getEncryptedUtxosOfTransaction = ({
+  batch,
+  senderAddress,
+  receiverAddress,
+}: any) => {
+  const {
+    babyjubPubkey: senderPubkey,
+  } = separateHex(senderAddress);
 
-export const utxoHash = ({ token, amount, pubkey, blinding }: TXO) => outUtxoInputs({ token, amount, pubkey, blinding })
+  return batch.utxosOut.map((utxo: any) => {
+    const address = utxo.pubkey === BigInt(senderPubkey)
+      ? senderAddress
+      : receiverAddress
 
-export const ownerCommit = ({ pubkey, blinding }: any) => poseidon([pubkey, blinding]);
-
-export const outUtxoInputs = ({ token, amount, pubkey, blinding }: any) => poseidon([token, amount, ownerCommit({pubkey, blinding})]);
-
-export const inUtxoInputs = ({ token, amount, blinding }: any) => [token, amount, blinding];
-
-export const getNullifier = ({ utxo, secret }: any) => poseidon([secret, utxoHash(utxo)])
-
-export const outUtxoInputsNoHashed = ({ blinding, token, amount, pubkey }: any) => {
-  const owner = ownerCommit({
-    blinding,
-    pubkey,
+    return encrypt({
+      address,
+      data: utxo,
+    })
   })
-
-  return [BigInt(token), BigInt(amount), BigInt(owner)]
 }

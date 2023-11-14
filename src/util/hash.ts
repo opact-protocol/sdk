@@ -1,4 +1,3 @@
-// @ts-expect-error
 import Pact from 'pact-lang-api'
 import { poseidon } from "circomlibjs"
 import { base64urlToBigInt } from "./string"
@@ -13,10 +12,10 @@ export const getPoseidonMessageHash = (extData: any) => {
   return poseidon([base64urlToBigInt(blakeHash)])
 }
 
-export const getBlakeTokenHash = (selected: any) => {
-  let preffix = selected.refName.name === 'coin' ? 'coin' : `test.${selected?.refName?.name as string}`
+export const getBlakeTokenHash = ({ namespace }: any) => {
+  let preffix = namespace.refName.name === 'coin' ? 'coin' : `test.${namespace?.refName?.name as string}`
 
-  if (selected.refName.name === 'poly-fungible-v2-reference') {
+  if (namespace.refName.name === 'poly-fungible-v2-reference') {
     preffix = 'free.poly-fungible-v2-reference'
   }
 
