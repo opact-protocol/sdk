@@ -26,7 +26,7 @@ export const getUtxo = ({
   return {
     id,
     hash,
-    address,
+    address: address.name || address,
     ...core
   };
 };
