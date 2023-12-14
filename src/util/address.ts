@@ -8,3 +8,11 @@ export function shortenAddress (
   )}`
 }
 
+export const getContractAddress = ({ namespace }: any) => {
+  const core = [
+    namespace.refName.namespace,
+    namespace.refName.name
+  ].filter(item => !!item)
+
+  return core.join('.')
+}

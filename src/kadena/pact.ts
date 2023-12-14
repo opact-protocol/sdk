@@ -1,9 +1,11 @@
+import { getContractAddress } from "../util"
+
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 export const getTransactionCode = ({
   proof,
   extData
 }: any) => {
-  return `(test.opact.transact {
+  return `(test.opact2.transact {
       "public_values":[${proof.public_values.join(' ')}],
       "a":{"x": ${proof.a.x}, "y": ${proof.a.y} },
       "b":{"x":[${proof.b.x.join(
@@ -30,15 +32,17 @@ export const getTransactionCode = ({
 
 export const getFaucetCode = (
   accountName: string,
-  preffix = 'coin',
+  token: any,
   withFund = true
 ) => {
+  const contractAddress = getContractAddress(token)
+
   return `${
     withFund &&
-    `(${preffix}.create-account ${JSON.stringify(
+    `(${contractAddress}.create-account ${JSON.stringify(
       accountName
     )} (read-keyset "${accountName}"))`
-  } (${preffix}.coinbase ${JSON.stringify(
+  } (${contractAddress}.coinbase ${JSON.stringify(
     accountName
   )} (read-keyset "${accountName}") 100.0)`
 }

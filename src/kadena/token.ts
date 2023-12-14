@@ -1,9 +1,10 @@
 import Pact from 'pact-lang-api'
 import { getConfig } from '../constants'
+import { getContractAddress } from '../util'
 
 export const getTokenDetails = async (
   accountName: string,
-  prefix: string
+  token: any
 ) => {
   const {
     nodeUrl
@@ -12,11 +13,13 @@ export const getTokenDetails = async (
   const createdAt =
     Math.round(new Date().getTime() / 1000) - 10
 
+  const contractAddress = getContractAddress(token)
+
   const {
     result: { status, data }
   } = await Pact.fetch.local(
     {
-      pactCode: `(${prefix}.details ${JSON.stringify(
+      pactCode: `(${contractAddress}.details ${JSON.stringify(
         accountName
       )})`,
       meta: Pact.lang.mkMeta('', '0', 0, 0, createdAt, 0)

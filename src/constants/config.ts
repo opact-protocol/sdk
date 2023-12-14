@@ -7,12 +7,13 @@ export function getConfig(
   switch (env) {
     case 'kadena-mainnet':
       return {
+        chainId: '1',
         symbol: 'KDA',
         name: 'Kadena',
-        networkId: 'testnet04',
-        key: 'kadena-mainnet',
+        networkId: 'mainnet01',
+        key: 'kadena:mainnet',
         website: 'https://kadena.io/',
-        OPACT_CONTRACT_ID: 'opact-contract',
+        OPACT_CONTRACT_ID: 'opact',
         OPACT_GAS_PAYER_ID: 'opact-gas-payer',
         explorerUrl: 'https://testnet.nearblocks.io',
         nodeUrl: 'https://kb96ugwxhi.execute-api.us-east-2.amazonaws.com',
@@ -20,38 +21,44 @@ export function getConfig(
       };
     case 'kadena-testnet':
       return {
+        chainId: '1',
         symbol: 'KDA',
         name: 'Kadena',
-        key: 'kadena-testnet',
+        key: 'kadena:testnet',
         networkId: 'testnet04',
+        OPACT_CONTRACT_ID: 'opact',
         website: 'https://kadena.io/',
-        OPACT_CONTRACT_ID: 'opact-contract',
+        OPACT_ACCOUNT_ID: 'opact-contract',
         OPACT_GAS_PAYER_ID: 'opact-gas-payer',
         explorerUrl: 'https://testnet.nearblocks.io',
         nodeUrl: 'https://kb96ugwxhi.execute-api.us-east-2.amazonaws.com',
         indexerUrl: 'https://bpsd19dro1.execute-api.us-east-2.amazonaws.com',
       };
-    case 'kadena-devnet':
+    case 'kadena-development':
       return {
+        chainId: '0',
         symbol: 'KDA',
         name: 'Kadena',
-        key: 'kadena-devnet',
-        networkId: 'devnet',
+        key: 'kadena:devnet',
+        networkId: 'development',
+        OPACT_CONTRACT_ID: 'opact2',
         website: 'https://kadena.io/',
-        OPACT_CONTRACT_ID: 'opact-contract',
+        OPACT_ACCOUNT_ID: 'opact2-contract',
         OPACT_GAS_PAYER_ID: 'opact-gas-payer',
         explorerUrl: 'https://testnet.nearblocks.io',
         nodeUrl: 'https://kb96ugwxhi.execute-api.us-east-2.amazonaws.com',
         indexerUrl: 'https://bpsd19dro1.execute-api.us-east-2.amazonaws.com',
-      };
+      }
     default:
       return {
+        chainId: '0',
         symbol: 'KDA',
         name: 'Kadena',
-        networkId: 'devnet',
-        key: 'kadena-devnet',
+        key: 'kadena:opact',
+        networkId: 'testnet04',
+        OPACT_CONTRACT_ID: 'opact2',
         website: 'https://kadena.io/',
-        OPACT_CONTRACT_ID: 'opact-contract',
+        OPACT_ACCOUNT_ID: 'opact2-contract',
         OPACT_GAS_PAYER_ID: 'opact-gas-payer',
         explorerUrl: 'https://testnet.nearblocks.io',
         nodeUrl: 'https://kb96ugwxhi.execute-api.us-east-2.amazonaws.com',

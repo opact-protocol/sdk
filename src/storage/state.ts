@@ -16,7 +16,7 @@ export const useStateStorage = ({
   const get = async () => {
     const encryptedUtxos = await localforage.getItem(utxosKey) as any || []
 
-    const indexOf = await localforage.getItem(indexOfKey) || 725
+    const indexOf = await localforage.getItem(indexOfKey) || 950
 
     return {
       indexOf,
@@ -39,7 +39,7 @@ export const useStateStorage = ({
 
   const clear = async () => {
     await localforage.setItem(utxosKey, [])
-    await localforage.setItem(indexOfKey, 725)
+    await localforage.setItem(indexOfKey, 950)
   }
 
   const exists = async (itemKey: string): Promise<boolean> => {

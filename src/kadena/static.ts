@@ -23,6 +23,7 @@ export const kadenaTokens = [
     symbol: 'KDX',
     name: 'Kaddex',
     address: 'opact-coin',
+    hash: '15821862032079215294618156740875230713624565630637201765764623930116541923162n',
     icon: 'https://opact.io/svg/kdx.svg',
     namespace: {
       id: '',

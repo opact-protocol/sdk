@@ -1,4 +1,4 @@
-const isPrefixedK = (str: string): boolean => str.startsWith('K:');
+const isPrefixedK = (str: string): boolean => str.startsWith('k:');
 
 const isPrefixedOZK = (str: string): boolean => str.startsWith('OZK');
 
