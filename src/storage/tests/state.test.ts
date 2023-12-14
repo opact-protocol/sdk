@@ -20,7 +20,7 @@ describe('State Storage Test', () => {
       exists,
     } = useStateStorage({})
 
-    let isCached = await exists('ozk:state:utxos:kadena-devnet')
+    let isCached = await exists('ozk:state:utxos:kadena:opact')
 
     assert(!isCached)
 
@@ -28,11 +28,11 @@ describe('State Storage Test', () => {
       encryptedUtxos: utxos
     })
 
-    isCached = await exists('ozk:state:utxos:kadena-devnet')
+    isCached = await exists('ozk:state:utxos:kadena:opact')
 
     assert(isCached)
 
-    isCached = await exists('ozk:state:indexOf:kadena-devnet')
+    isCached = await exists('ozk:state:indexOf:kadena:opact')
 
     assert(!isCached)
 
@@ -42,7 +42,7 @@ describe('State Storage Test', () => {
       indexOf
     })
 
-    isCached = await exists('ozk:state:indexOf:kadena-devnet')
+    isCached = await exists('ozk:state:indexOf:kadena:opact')
 
     assert(isCached)
 
