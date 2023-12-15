@@ -1,6 +1,6 @@
 {
   "name": "opact-sdk",
-  "version": "1.1.17",
+  "version": "1.1.19",
   "description": "Opact Protocol SDK to integrate with Opact Ecosystem",
   "author": "OPACT core Contributors",
   "license": "MIT",
@@ -45,6 +45,7 @@
     "fetch-mock": "^9.11.0",
     "ffjavascript": "^0.2.60",
     "fixed-merkle-tree": "^0.7.3",
+    "graphql-request": "^6.1.0",
     "js-base64": "^3.7.5",
     "localforage": "^1.10.0",
     "pact-lang-api": "^4.3.6",

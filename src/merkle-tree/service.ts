@@ -3,6 +3,8 @@ import { treeHash } from '../util/poseidon';
 import { MerkleTree as RawTree } from './tree';
 import { MerkleTreeServiceInterface } from './types/tree.types';
 import { emptyElement, subtreeExpectedValue, treeHeight } from '../constants/tree';
+import request, { gql } from 'graphql-request';
+import { getConfig } from '../constants';
 
 export class MerkleTreeService {
   readonly dbUrl: string;
@@ -54,27 +56,79 @@ export class MerkleTreeService {
   }
 
   async getLeafsFromDB() {
+    const config = getConfig()
+
     let leafs: string[] = []
 
     let isLastPage = false
 
-    while (!isLastPage) {
-      const response = await fetch(this.dbUrl)
+    if (config.key === 'kadena:testnet') {
+      while (!isLastPage) {
+        const response = await fetch(this.dbUrl)
 
-      const {
-        data,
-        is_last_page
-      } = await response.json()
+        const {
+          data,
+          is_last_page
+        } = await response.json()
 
-      leafs = [...leafs, ...data.map((dataItem: any) => {
-        if (typeof dataItem === 'string') {
-          return BigInt(dataItem)
+        leafs = [...leafs, ...data.map((dataItem: any) => {
+          if (typeof dataItem === 'string') {
+            return BigInt(dataItem)
+          }
+
+          return BigInt(dataItem.value)
+        })]
+
+        isLastPage = is_last_page
+      }
+
+    } else {
+      let page = 1
+
+      while (!isLastPage) {
+        const {
+          getEvents
+        } = await request(
+          this.dbUrl,
+
+          gql`
+            query GetCommitments($page: Int!, $size: Int!, $module: String!, $chainId: Int!) {
+              getCommitments(page: $page, size: $size, module: $module, chainId: $chainId) {
+                currentPage
+                events
+                hasNextPage
+                itemCount
+              }
+            }
+          `,
+          {
+            page,
+            size: 200,
+            chain: Number(config.chainId),
+            module: config.OPACT_CONTRACT_ID,
+          }
+        ) as any
+
+        const {
+          events,
+          hasNextPage,
+          currentPage,
+        } = getEvents
+
+        leafs = [...leafs, ...events.map((dataItem: any) => {
+          if (typeof dataItem === 'string') {
+            return BigInt(dataItem)
+          }
+
+          return BigInt(dataItem.value)
+        })]
+
+        if (hasNextPage) {
+          page = (currentPage as number) + 1
         }
 
-        return BigInt(dataItem.value)
-      })]
-
-      isLastPage = is_last_page
+        isLastPage = !hasNextPage
+      }
     }
 
     this.leafs = leafs
