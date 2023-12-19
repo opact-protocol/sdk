@@ -43,6 +43,8 @@
     "no-useless-constructor": 0,
     "no-empty-function": 0,
     "no-unused-vars": 0,
+    "no-await-in-loop": 0,
+    "class-methods-use-this": 0,
     "no-bitwise": 0,
     "camelcase": 0,
     "@typescript-eslint/no-unused-vars": 1,

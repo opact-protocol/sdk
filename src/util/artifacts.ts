@@ -1,23 +1,17 @@
-/* eslint-disable prefer-destructuring */
 import axios from 'axios';
-import { artifactStore } from './artifact-store';
-
-export const loadArtifacts = async (): Promise<void> => {
-  console.log('Start artifacts')
-
-  await Promise.all([
-    loadArtifact(),
-  ])
-
-  console.log('Downloads ends')
-}
+import { useCircuitStorage } from '../storage/circuit';
 
 export const loadArtifact = async (): Promise<any> => {
   const path = '/transaction_0001.zkey';
 
+  const {
+    store,
+    exists,
+  } = useCircuitStorage({ key: path })
+
   const url = new URL(path, window.location.origin).toString()
 
-  if (await artifactStore.exists(path)) {
+  if (await exists(path)) {
     return path;
   }
 
@@ -45,9 +39,7 @@ export const loadArtifact = async (): Promise<any> => {
 
     const data: ArrayBuffer = result?.data || [];
 
-    await artifactStore.store(
-      'zkey',
-      path,
+    await store(
       new Uint8Array(data),
     );
 
@@ -55,4 +47,6 @@ export const loadArtifact = async (): Promise<any> => {
   } catch (err: any) {
     console.warn(err)
   }
+
+  return null
 }

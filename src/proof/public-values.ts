@@ -1,6 +1,5 @@
-// TODO: FIX ESLINT
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { groth16 } from 'snarkjs'
+
 export const getPublicArgs = (
   proof: any,
   publicSignals: string[]
@@ -20,4 +19,25 @@ export const getPublicArgs = (
       y: proof.pi_c[1]
     }
   }
+}
+
+export const getPublicArgsToEVM = (
+  proof: any,
+  publicSignals: string[]
+) => {
+  const stringPublicArgs = groth16.exportSolidityCallData(proof, publicSignals) as string
+
+  const [
+    a,
+    b,
+    c,
+    public_values
+  ] = JSON.parse(`[${stringPublicArgs}]`)
+
+  return [
+    public_values,
+    a,
+    b,
+    c,
+  ]
 }

@@ -17,3 +17,7 @@ declare type Artifact = {
 };
 
 declare module 'snarkjs';
+
+declare module 'pact-lang-api'
+
+declare module 'chai-fetch-mock'

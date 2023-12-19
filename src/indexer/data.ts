@@ -1,13 +1,6 @@
-/* eslint-disable no-await-in-loop */
-// TODO FIX ESLINT FOR ALL VALUES
-/* eslint-disable @typescript-eslint/strict-boolean-expressions */
-/* eslint-disable no-param-reassign */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { getNullifier } from "../utxo"
-import { decrypt, getUtxoFromDecrypted } from "../encryption"
+import { decrypt } from "../encryption"
+import { deriveBabyJubKeysFromEth } from "../keys"
 
 const RPC = 'https://bpsd19dro1.execute-api.us-east-2.amazonaws.com'
 
@@ -59,10 +52,10 @@ export const getUserBalanceBySecret = async (
 
   encrypted = encrypted.map((item: any) => {
     try {
-      const value = getUtxoFromDecrypted(decrypt(
-        item,
-        secret,
-      ))
+      const value = decrypt({
+        encrypted: item,
+        privateKey: secret,
+      })
 
       return value
     } catch (e) {
@@ -100,10 +93,11 @@ export const getUserReceiptsBySecret = async (
 
   receipts = receipts.map((receipt: any) => {
     try {
-      const value = getUtxoFromDecrypted(decrypt(
-        receipt,
-        secret,
-      ))
+      const value =  decrypt({
+        isUtxo: false,
+        encrypted: receipt,
+        privateKey: secret,
+      })
 
       return value
     } catch (e) {
@@ -113,8 +107,6 @@ export const getUserReceiptsBySecret = async (
     if (!item) {
       return false
     }
-
-    console.log('item', item)
 
     return !storedReceipts.find((value: any) => {
       return value?.date === item?.date
@@ -129,34 +121,26 @@ export const getUserReceiptsBySecret = async (
 
 export const groupUtxoByToken = (encrypted: any, nullifiers: any, secret: any) => {
   return encrypted.reduce((acc: any, curr: any) => {
-    const utxo = {
-      id: curr.id,
-      address: curr.address,
-      hash: BigInt(curr.hash),
-      token: BigInt(curr.token),
-      amount: BigInt(curr.amount),
-      pubkey: BigInt(curr.pubkey),
-      blinding: BigInt(curr.blinding),
-    }
+    const derivedKeys = deriveBabyJubKeysFromEth({ pvtkey: secret })
 
     const nullifier = getNullifier({
-      utxo,
-      secret
+      utxo: curr,
+      secret: derivedKeys.pvtkey
     })
 
     const isOnUtxos = acc.utxos.find((value: any) => {
-      return value.blinding === utxo.blinding
+      return value.blinding === curr.blinding
     })
 
-    if (nullifiers.includes(nullifier.toString()) || utxo.amount === 0n || !!isOnUtxos) {
+    if (nullifiers.includes(nullifier.toString()) || curr.amount === 0n || !!isOnUtxos) {
       return acc
     }
 
-    acc.utxos.push(utxo)
+    acc.utxos.push(curr)
 
     const {
       address
-    } = utxo
+    } = curr
 
     if (!acc.treeBalances[address]) {
       acc.treeBalances[address] = {
@@ -166,8 +150,8 @@ export const groupUtxoByToken = (encrypted: any, nullifiers: any, secret: any) =
       }
     }
 
-    acc.treeBalances[address].balance += utxo.amount
-    acc.treeBalances[address].utxos = [...acc.treeBalances[address].utxos, utxo]
+    acc.treeBalances[address].balance += curr.amount
+    acc.treeBalances[address].utxos = [...acc.treeBalances[address].utxos, curr]
 
     return acc
   }, {

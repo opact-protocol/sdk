@@ -1,114 +1,82 @@
-import { getPoseidonTokenHash } from "../util"
-import { computeTreeValues } from '../proof/tree-values'
 import { getDelta, getSolutionBatch, getSolutionBatchForNFT, getSolutionOuts } from "./solutions"
+import { deriveBabyJubKeysFromEth } from "../keys"
+import { separateHex } from "../util/hex"
 
 export const getTransferSolutionBatch = async ({
   treeBalance,
   senderWallet,
   totalRequired,
-  receiverPubkey,
-  selectedToken = {
-    id: '',
-    refName: {
-      name: 'coin',
-      namespace: ''
-    },
-    refSpec: {
-      name: 'fungible-v2',
-      namespace: ''
-    }
-  },
+  selectedToken,
+  receiverAddress,
+  receipts = [],
   excludedUTXOIDPositions = [],
 }: any) => {
-  if (receiverPubkey) {
-    receiverPubkey = BigInt(receiverPubkey)
-  }
+  const {
+    babyjubPubkey = '',
+  } = separateHex(receiverAddress)
 
-  const token = getPoseidonTokenHash(selectedToken)
+  const derivedKeys = deriveBabyJubKeysFromEth(senderWallet)
 
   const utxosIn = await getSolutionBatch({
-    treeBalance: {
-      ...treeBalance,
-      token,
-    },
+    treeBalance,
     totalRequired,
     excludedUTXOIDPositions,
-    pubkey: senderWallet.pubkey,
+    pubkey: derivedKeys.pubkey,
   })
 
   const utxosOut = await getSolutionOuts({
     utxosIn,
-    treeBalance: {
-      ...treeBalance,
-      token,
-    },
+    receipts,
+    treeBalance,
     selectedToken,
     totalRequired,
-    receiverPubkey,
-    senderPubkey: senderWallet.pubkey,
+    receiverPubkey: babyjubPubkey,
+    senderPubkey: derivedKeys.pubkey,
   })
 
   const delta = await getDelta({ utxosOut, utxosIn })
 
-  const {
-    roots,
-    newIns
-  } = await computeTreeValues(utxosIn)
-
   return {
     delta,
-    roots,
-    token,
+    utxosIn,
     utxosOut,
-    utxosIn: newIns,
   }
 }
 
-export const getTransferSolutionBatchForNft = async ({
+export const getTransferSolutionBatchForNFT = async ({
   treeBalance,
   senderWallet,
   selectedToken,
   totalRequired,
-  receiverPubkey,
+  receiverAddress,
+  receipts = [],
 }: any) => {
-  if (receiverPubkey) {
-    receiverPubkey = BigInt(receiverPubkey)
-  }
+  const {
+    babyjubPubkey = '',
+  } = separateHex(receiverAddress)
 
-  const token = getPoseidonTokenHash(selectedToken)
+  const derivedKeys = deriveBabyJubKeysFromEth(senderWallet)
 
   const utxosIn = await getSolutionBatchForNFT({
-    treeBalance: {
-      ...treeBalance,
-      token,
-    },
-    pubkey: senderWallet.pubkey,
+    treeBalance,
+    pubkey: derivedKeys.pubkey,
   })
 
   const utxosOut = await getSolutionOuts({
     utxosIn,
-    treeBalance: {
-      ...treeBalance,
-      token,
-    },
+    receipts,
+    treeBalance,
     selectedToken,
     totalRequired,
-    receiverPubkey,
-    senderPubkey: senderWallet.pubkey,
+    receiverPubkey: babyjubPubkey,
+    senderPubkey: derivedKeys.pubkey,
   })
 
   const delta = await getDelta({ utxosOut, utxosIn })
 
-  const {
-    roots,
-    newIns
-  } = await computeTreeValues(utxosIn)
-
   return {
     delta,
-    roots,
-    token,
+    utxosIn,
     utxosOut,
-    utxosIn: newIns,
   }
 }
