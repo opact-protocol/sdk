@@ -1,10 +1,17 @@
 import { getUtxo } from "../utxo";
 import { formatInteger, isValidNullifierCount } from "../util";
+import { KadenaTokenInterface } from "../constants";
+import { ReceiptInterface } from "../receipts";
 
 const base = 21888242871839275222246405745257275088548364400416034343698204186575808495617n
 
-const getUTXOIDPosition = ({ txid, position}: any): string => {
-  return `${txid as string}-${position as string}`;
+export interface GetUTXOIDPositionInterface {
+  txid: string,
+  position: string
+}
+
+const getUTXOIDPosition = ({ txid, position}: GetUTXOIDPositionInterface): string => {
+  return `${txid}-${position}`;
 };
 
 export const filterZeroUTXOs = (utxos: any[]): any[] => {
@@ -15,7 +22,12 @@ export const calculateTotalSpend = (utxos: any[]): bigint => {
   return utxos.reduce((left, right) => left as bigint + BigInt(right.amount), BigInt(0));
 }
 
-export const getDelta = async ({ utxosIn, utxosOut }: any) => {
+export interface GetDeltaInterface {
+  utxosIn: any[],
+  utxosOut: any[]
+}
+
+export const getDelta = async ({ utxosIn, utxosOut }: GetDeltaInterface) => {
   const totalIn = calculateTotalSpend(utxosIn)
 
   const totalOut = calculateTotalSpend(utxosOut)
@@ -23,6 +35,16 @@ export const getDelta = async ({ utxosIn, utxosOut }: any) => {
   const rawAmount = totalOut - totalIn
 
   return rawAmount < 0n ? base + rawAmount : rawAmount
+}
+
+export interface GetSolutionOutsInterface {
+  utxosIn: any[],
+  senderPubkey: string,
+  receipts?: ReceiptInterface[],
+  isDeposit?: boolean,
+  receiverPubkey?: string,
+  selectedToken: KadenaTokenInterface,
+  totalRequired: string | number | bigint,
 }
 
 export const getSolutionOuts = async ({
@@ -33,7 +55,7 @@ export const getSolutionOuts = async ({
   receiverPubkey,
   isDeposit = false,
   receipts = []
-}: any): Promise<any> => {
+}: GetSolutionOutsInterface): Promise<any> => {
   if (typeof totalRequired !== 'bigint') {
     totalRequired = BigInt(formatInteger(totalRequired, 12))
   }
@@ -113,10 +135,15 @@ export const findSubsetsWithSum = (arr: any, target: bigint): any => {
   return result;
 }
 
+export interface GetSolutionBatchForNFTInterface {
+  pubkey: string
+  treeBalance: any
+}
+
 export const getSolutionBatchForNFT = async ({
   pubkey,
   treeBalance,
-}: any) => {
+}: GetSolutionBatchForNFTInterface) => {
   const nft = treeBalance.utxos.find((utxo: any) => utxo.token === treeBalance.token);
 
   if (!nft) {
@@ -126,12 +153,19 @@ export const getSolutionBatchForNFT = async ({
   return [nft, getUtxo({ token: treeBalance.token, pubkey }), getUtxo({ token: treeBalance.token, pubkey })]
 }
 
+export interface GetSolutionBatchInterface {
+  pubkey: string,
+  treeBalance: any,
+  excludedUTXOIDPositions: string[],
+  totalRequired: string | number | bigint,
+}
+
 export const getSolutionBatch = async ({
   pubkey,
   treeBalance,
   totalRequired,
   excludedUTXOIDPositions = [],
-}: any): Promise<any> => {
+}: GetSolutionBatchInterface): Promise<any> => {
   if (typeof totalRequired !== 'bigint') {
     totalRequired = BigInt(formatInteger(totalRequired, 12))
   }
@@ -148,7 +182,7 @@ export const getSolutionBatch = async ({
 
   // Use exact match if it exists.
   // TODO: Use exact matches from any tree, not just the first tree examined.
-  const exactMatch = filteredUTXOs.find((utxo) => BigInt(utxo.amount) >= totalRequired);
+  const exactMatch = filteredUTXOs.find((utxo) => BigInt(utxo.amount) >= (totalRequired as bigint));
 
   if (exactMatch) {
     return [exactMatch, getUtxo({

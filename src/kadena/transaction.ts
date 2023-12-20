@@ -3,9 +3,30 @@ import PactApi from 'pact-lang-api'
 import { genKeyPair, sign } from '@kadena/cryptography-utils';
 import { PactNumber } from '@kadena/pactjs'
 import { Pact, createClient, isSignedTransaction } from '@kadena/client';
-import { getConfig } from '../constants'
+import { KadenaTokenInterface, NamespaceInterface, getConfig } from '../constants'
 import { formatBigNumberWithDecimals, getContractAddress, getDecimals } from '../util';
 import { opactTransactCode } from './pact';
+
+export interface GetKdaTransactionParamsInterface {
+  batch: any,
+  amount: string | number,
+  sender: string,
+  receiver?: string,
+  selectedToken: KadenaTokenInterface,
+  encryptedUtxos: string[],
+  encryptedReceipts?: string[],
+}
+
+export interface ExtDataInterface {
+  sender: string,
+  tokenType: string,
+  recipient: string,
+  tokenId: string | number,
+  outputCommitments: string[],
+  tokenAmount: string | number,
+  encryptedCommitments: string[],
+  encryptedReceipts?: string[],
+}
 
 export const getKdaTransactionParams = ({
   batch,
@@ -14,8 +35,8 @@ export const getKdaTransactionParams = ({
   receiver,
   selectedToken,
   encryptedUtxos,
-  encryptedReceipts,
-}: any) => {
+  encryptedReceipts = [],
+}: GetKdaTransactionParamsInterface) => {
   return {
     sender,
     encryptedReceipts,
@@ -28,12 +49,19 @@ export const getKdaTransactionParams = ({
   }
 }
 
+export interface GetPartialOpactCommandInterface {
+  proof: any,
+  senderAccount: string,
+  extData: ExtDataInterface,
+  tokenSpec: NamespaceInterface,
+}
+
 export const getPartialOpactCommand = ({
   proof,
   extData,
   tokenSpec,
   senderAccount,
-}: any) => {
+}: GetPartialOpactCommandInterface): any => {
   const {
     chainId,
     networkId,
@@ -112,9 +140,15 @@ export const sendSigned = async (cmd: any) => {
   return result
 }
 
+export interface BaseTransactionParams {
+  proof: any,
+  extData: ExtDataInterface,
+  tokenSpec: NamespaceInterface,
+}
+
 export const sendOZKTransaction = async (
-  receiver: any,
-  { proof, extData, tokenSpec }: any,
+  receiver: string,
+  { proof, extData, tokenSpec }: BaseTransactionParams,
   callbackProgress: any
 ): Promise<any> => {
   const keyPair = genKeyPair()
@@ -124,17 +158,15 @@ export const sendOZKTransaction = async (
     OPACT_GAS_PAYER_ID,
   } = getConfig()
 
-  console.log('receiver', receiver)
-
   const token = {
     namespace: tokenSpec,
-  }
+  } as KadenaTokenInterface
 
   const contractAddress = getContractAddress(token)
 
   const decimals = getDecimals(12)
 
-  const amount = formatBigNumberWithDecimals(extData.tokenAmount * -1, decimals)
+  const amount = formatBigNumberWithDecimals((extData.tokenAmount as any) * -1, decimals)
 
   const pactCommand = getPartialOpactCommand({
       proof,

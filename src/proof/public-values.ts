@@ -1,9 +1,27 @@
 import { groth16 } from 'snarkjs'
 
+export type ProofValues = string
+
+export interface PublicArgsInterface {
+  public_values: string[],
+  a: {
+    x: ProofValues,
+    y: ProofValues
+  },
+  b: {
+    x: ProofValues[],
+    y: ProofValues[]
+  },
+  c: {
+    x: ProofValues,
+    y: ProofValues
+  }
+}
+
 export const getPublicArgs = (
   proof: any,
   publicSignals: string[]
-): any => {
+): PublicArgsInterface => {
   return {
     public_values: publicSignals,
     a: {
@@ -24,7 +42,7 @@ export const getPublicArgs = (
 export const getPublicArgsToEVM = (
   proof: any,
   publicSignals: string[]
-) => {
+): string[] => {
   const stringPublicArgs = groth16.exportSolidityCallData(proof, publicSignals) as string
 
   const [

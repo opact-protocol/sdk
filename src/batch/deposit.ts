@@ -1,6 +1,16 @@
 import { getUtxo } from '../utxo'
 import { getDelta, getSolutionOuts } from "./solutions"
 import { deriveBabyJubKeysFromEth } from '../keys'
+import { KadenaTokenInterface } from '../constants'
+import { ReceiptInterface } from '../receipts'
+
+export interface GetDepositSoluctionBatchInterface {
+  senderWallet: any
+  receipts?: ReceiptInterface[]
+  receiverPubkey?: string
+  totalRequired: string | number | bigint
+  selectedToken: KadenaTokenInterface
+}
 
 export const getDepositSoluctionBatch = async ({
   senderWallet,
@@ -8,7 +18,7 @@ export const getDepositSoluctionBatch = async ({
   selectedToken,
   receiverPubkey,
   receipts = [],
-}: any) => {
+}: GetDepositSoluctionBatchInterface) => {
   const derivedKeys = deriveBabyJubKeysFromEth(senderWallet)
 
   const utxosIn =  [

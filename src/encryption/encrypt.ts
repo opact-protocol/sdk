@@ -1,9 +1,14 @@
 import { encode } from 'js-base64';
 import * as naclUtil from 'tweetnacl-util';
 import { encrypt as _encrypt } from '@metamask/eth-sig-util';
-import { EncryptInterface } from './types/encrypt.type';
 import { hexToUint8Array, stringifyUtxo, strip0x } from '../util';
 import { separateHex } from '../util/hex';
+
+export interface EncryptInterface {
+  data: unknown;
+  address: string;
+  isUtxo?: boolean
+}
 
 export const encrypt = ({ data, address, isUtxo = true }: EncryptInterface) => {
   const {
