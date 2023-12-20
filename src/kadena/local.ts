@@ -7,11 +7,9 @@ export const getTokenDetails = async (
   token: any
 ) => {
   const {
-    nodeUrl
+    nodeUrl,
+    chainId,
   } = getConfig()
-
-  const createdAt =
-    Math.round(new Date().getTime() / 1000) - 10
 
   const contractAddress = getContractAddress(token)
 
@@ -19,10 +17,15 @@ export const getTokenDetails = async (
     result: { status, data }
   } = await Pact.fetch.local(
     {
-      pactCode: `(${contractAddress}.details ${JSON.stringify(
-        accountName
-      )})`,
-      meta: Pact.lang.mkMeta('', '0', 0, 0, createdAt, 0)
+      pactCode: `(${contractAddress}.details "${accountName}")`,
+      meta: {
+        creationTime: Math.round(new Date().getTime() / 1000) - 10,
+        ttl: 600,
+        chainId,
+        gasLimit: 600,
+        gasPrice: 0.0000001,
+        sender: '',
+      },
     },
     nodeUrl
   )

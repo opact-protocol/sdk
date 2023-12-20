@@ -15,7 +15,9 @@ export function getConfig(
         indexerUrl: 'https://nish60qcn3.execute-api.us-east-2.amazonaws.com/graphql',
         nodeUrl: 'https://api.testnet.chainweb.com/chainweb/0.0/testnet04/chain/0/pact',
 
-        OPACT_CONTRACT_ID: 'opact2',
+        OPACT_CONTRACT_ID: 'opact',
+        OPACT_CONTRACT_NAMESPACE: 'free',
+        OPACT_ACCOUNT_ID: 'opact-contract',
         OPACT_GAS_PAYER_ID: 'opact-gas-payer',
       };
 
@@ -25,29 +27,15 @@ export function getConfig(
         name: 'Kadena',
         key: 'kadena:testnet',
         networkId: 'testnet04',
-        OPACT_CONTRACT_ID: 'opact2',
         website: 'https://kadena.io/',
         indexerUrl: 'https://nish60qcn3.execute-api.us-east-2.amazonaws.com/graphql',
         nodeUrl: 'https://api.testnet.chainweb.com/chainweb/0.0/testnet04/chain/0/pact',
 
+        OPACT_CONTRACT_ID: 'opact',
+        OPACT_CONTRACT_NAMESPACE: 'free',
         OPACT_ACCOUNT_ID: 'opact-contract',
         OPACT_GAS_PAYER_ID: 'opact-gas-payer',
       };
-
-    case 'kadena-development':
-      return {
-        chainId: '0',
-        name: 'Kadena',
-        key: 'kadena:devnet',
-        networkId: 'development',
-        OPACT_CONTRACT_ID: 'opact2',
-        website: 'https://kadena.io/',
-        nodeUrl: 'https://kb96ugwxhi.execute-api.us-east-2.amazonaws.com',
-        indexerUrl: 'https://bpsd19dro1.execute-api.us-east-2.amazonaws.com',
-
-        OPACT_ACCOUNT_ID: 'opact2-contract',
-        OPACT_GAS_PAYER_ID: 'opact-gas-payer',
-      }
 
     default:
       return {
@@ -55,11 +43,12 @@ export function getConfig(
         name: 'Kadena',
         key: 'kadena:opact',
         networkId: 'testnet04',
-        OPACT_CONTRACT_ID: 'opact2',
         website: 'https://kadena.io/',
         nodeUrl: 'https://kb96ugwxhi.execute-api.us-east-2.amazonaws.com',
         indexerUrl: 'https://bpsd19dro1.execute-api.us-east-2.amazonaws.com',
 
+        OPACT_CONTRACT_ID: 'opact2',
+        OPACT_CONTRACT_NAMESPACE: '',
         OPACT_ACCOUNT_ID: 'opact2-contract',
         OPACT_GAS_PAYER_ID: 'opact-gas-payer',
       };

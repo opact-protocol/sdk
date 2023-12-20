@@ -1,5 +1,6 @@
 import localforage from 'localforage'
 import { getKeysByChainId } from './utils'
+import { getConfig } from '../constants'
 
 const defaultKey = 'ozk:state'
 
@@ -8,6 +9,8 @@ export const useStateStorage = ({
 }: {
   key?: string,
 }) => {
+  const config = getConfig()
+
   const {
     utxosKey,
     indexOfKey,
@@ -16,7 +19,8 @@ export const useStateStorage = ({
   const get = async () => {
     const encryptedUtxos = await localforage.getItem(utxosKey) as any || []
 
-    const indexOf = await localforage.getItem(indexOfKey) || 950
+    const indexOf = await localforage.getItem(indexOfKey) ||
+      config.key === 'kadena:testnet' ? 1 : 950
 
     return {
       indexOf,
@@ -39,7 +43,7 @@ export const useStateStorage = ({
 
   const clear = async () => {
     await localforage.setItem(utxosKey, [])
-    await localforage.setItem(indexOfKey, 950)
+    await localforage.setItem(indexOfKey, config.key === 'kadena:testnet' ? 1 : 950)
   }
 
   const exists = async (itemKey: string): Promise<boolean> => {

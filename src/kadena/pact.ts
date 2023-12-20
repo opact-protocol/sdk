@@ -1,11 +1,13 @@
 import { getContractAddress } from "../util"
 
+export const opactTransactCode = "(free.opact.transact (read-msg 'proof) (read-msg 'extData))"
+
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 export const getTransactionCode = ({
   proof,
   extData
 }: any) => {
-  return `(test.opact2.transact {
+  return `(free.opact.transact {
       "public_values":[${proof.public_values.join(' ')}],
       "a":{"x": ${proof.a.x}, "y": ${proof.a.y} },
       "b":{"x":[${proof.b.x.join(

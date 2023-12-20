@@ -43,6 +43,8 @@ export class MerkleTreeService {
   }
 
   async getTreeFromDB() {
+    const config = getConfig()
+
     let leafs = await this.getLeafsFromDB()
 
     if (leafs.length < 3) {
@@ -52,7 +54,11 @@ export class MerkleTreeService {
     }
 
     // TODO: MOVE THIS TO SDK, OPACT HAS 0, 0, 0 VALUES ON STARTS OF ARRAY
-    return this.createTree(['0', '0', '0', ...leafs])
+    if (config.key === 'kadena:opact') {
+      return this.createTree(['0', '0', '0', ...leafs])
+    }
+
+    return this.createTree([...leafs])
   }
 
   async getLeafsFromDB() {
@@ -62,7 +68,7 @@ export class MerkleTreeService {
 
     let isLastPage = false
 
-    if (config.key === 'kadena:testnet') {
+    if (config.key === 'kadena:opact') {
       while (!isLastPage) {
         const response = await fetch(this.dbUrl)
 
@@ -87,7 +93,7 @@ export class MerkleTreeService {
 
       while (!isLastPage) {
         const {
-          getEvents
+          getCommitments
         } = await request(
           this.dbUrl,
 
@@ -104,8 +110,8 @@ export class MerkleTreeService {
           {
             page,
             size: 200,
-            chain: Number(config.chainId),
-            module: config.OPACT_CONTRACT_ID,
+            chainId: Number(config.chainId),
+            module: `free.${config.OPACT_CONTRACT_ID}`,
           }
         ) as any
 
@@ -113,7 +119,7 @@ export class MerkleTreeService {
           events,
           hasNextPage,
           currentPage,
-        } = getEvents
+        } = getCommitments
 
         leafs = [...leafs, ...events.map((dataItem: any) => {
           if (typeof dataItem === 'string') {

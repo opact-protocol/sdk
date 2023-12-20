@@ -8,7 +8,7 @@ import { getRandomWallet } from '../../keys';
 import { separateHex } from '../../util/hex';
 import { MerkleTreeService } from '../../merkle-tree';
 import { computeInputs } from '../../proof';
-import { kadenaTokens as kadenaBaseTokens } from '../../kadena/static';
+import { kadenaTokens as kadenaBaseTokens } from '../../constants';
 import { getEncryptedReceiptsOfTransaction } from '../../receipts';
 import { getKdaMessage, getKdaTransactionParams } from '../../kadena';
 import { getTransferSolutionBatch, getTransferSolutionBatchForNFT } from '../transfer';

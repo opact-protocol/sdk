@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { getEncryptedReceiptsOfTransaction } from '../receipts';
 import { getRandomWallet } from '../../keys';
-import { kadenaTokens as kadenaBaseTokens } from '../../kadena/static';
+import { kadenaTokens as kadenaBaseTokens } from '../../constants';
 import { decrypt } from '../../encryption';
 
 describe('Receipts tests', () => {

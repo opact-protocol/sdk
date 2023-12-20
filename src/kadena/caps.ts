@@ -1,11 +1,11 @@
 
 import Pact from 'pact-lang-api'
 import { getConfig } from '../constants'
-import { getContractAddress } from '../util'
+import { formatBigNumberWithDecimals, getContractAddress, getDecimals } from '../util'
 
 export const getCapsForWithdraw = (
   accountName: string,
-  amount: any,
+  integer: any,
   receiver: any,
   tokenSpec: any
 ) => {
@@ -13,6 +13,10 @@ export const getCapsForWithdraw = (
     OPACT_ACCOUNT_ID,
     OPACT_GAS_PAYER_ID
   } = getConfig()
+
+  const decimals = getDecimals(12)
+
+  const amount = formatBigNumberWithDecimals(integer * -1, decimals)
 
   const contractAddress = getContractAddress({ namespace: tokenSpec })
 
@@ -26,7 +30,7 @@ export const getCapsForWithdraw = (
           tokenSpec?.id || '',
           OPACT_ACCOUNT_ID,
           receiver,
-          Number((amount * -1).toFixed(1))
+          Number((amount))
         ]
       ),
       Pact.lang.mkCap(
@@ -50,7 +54,7 @@ export const getCapsForWithdraw = (
       [
         OPACT_ACCOUNT_ID,
         receiver,
-        Number((amount * -1).toFixed(1))
+        Number((amount))
       ]
     ),
     Pact.lang.mkCap(
@@ -68,12 +72,16 @@ export const getCapsForWithdraw = (
 
 export const getCapsForDeposit = (
   accountName: string,
-  amount: number | string,
+  integer: number | string,
   tokenSpec = { id: '' }
 ) => {
   const {
     OPACT_ACCOUNT_ID,
   } = getConfig()
+
+  const decimals = getDecimals(12)
+
+  const amount = formatBigNumberWithDecimals(integer, decimals)
 
   const contractAddress = getContractAddress({ namespace: tokenSpec })
 
@@ -87,7 +95,7 @@ export const getCapsForDeposit = (
           tokenSpec.id,
           accountName,
           OPACT_ACCOUNT_ID,
-          Number(Number(amount).toFixed(1))
+          Number(amount)
         ]
       )
     ]
@@ -95,55 +103,20 @@ export const getCapsForDeposit = (
 
   return [
     Pact.lang.mkCap(
+      'Coin Gas',
+      'Capability to pay Gas',
+      'coin.GAS',
+      []
+    ),
+    Pact.lang.mkCap(
       'Coin Transfer',
       'Capability to transfer designated amount of coin from sender to receiver',
       `${contractAddress}.TRANSFER`,
       [
         accountName,
         OPACT_ACCOUNT_ID,
-        Number(Number(amount).toFixed(1))
+        Number(amount)
       ]
     )
-  ]
-}
-
-export const getCapsForTransfer = ({
-  token,
-  amount,
-  receiver,
-}: any) => {
-  const {
-    OPACT_CONTRACT_ID,
-    OPACT_GAS_PAYER_ID,
-  } = getConfig()
-
-  const contractAddress = getContractAddress(token)
-
-  return [
-    Pact.lang.mkCap(
-      'Coin Transfer',
-      'Capability to transfer designated amount of coin from sender to receiver',
-      `${contractAddress}.TRANSFER`,
-      [
-        OPACT_CONTRACT_ID,
-        receiver,
-        Number((amount * -1).toFixed(1))
-      ]
-    ),
-
-    Pact.lang.mkCap(
-      'Coin Transfer for Gas',
-      'Capability to transfer gas fee from sender to gas payer',
-      `${contractAddress}.TRANSFER`,
-      [OPACT_CONTRACT_ID, OPACT_GAS_PAYER_ID, 1.0]
-    ),
-
-    {
-      cap:
-      {
-        name: `${OPACT_GAS_PAYER_ID}.GAS_PAYER`,
-        args: [1.0]
-      }
-    }
   ]
 }

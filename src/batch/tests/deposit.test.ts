@@ -9,7 +9,7 @@ import { MerkleTreeService } from '../../merkle-tree';
 import { getDepositSoluctionBatch } from '../deposit';
 import { groth16 } from 'snarkjs'
 import { computeInputs } from '../../proof';
-import { kadenaTokens as kadenaBaseTokens } from '../../kadena/static';
+import { kadenaTokens as kadenaBaseTokens } from '../../constants';
 import { getEncryptedReceiptsOfTransaction } from '../../receipts';
 import { getKdaMessage, getKdaTransactionParams } from '../../kadena';
 
