@@ -1,13 +1,13 @@
 
 import Pact from 'pact-lang-api'
-import { getConfig } from '../constants'
+import { KadenaTokenInterface, NamespaceInterface, getConfig } from '../constants'
 import { formatBigNumberWithDecimals, getContractAddress, getDecimals } from '../util'
 
 export const getCapsForWithdraw = (
   accountName: string,
-  integer: any,
-  receiver: any,
-  tokenSpec: any
+  integer: number,
+  receiver: string,
+  tokenSpec: NamespaceInterface
 ) => {
   const {
     OPACT_ACCOUNT_ID,
@@ -18,7 +18,7 @@ export const getCapsForWithdraw = (
 
   const amount = formatBigNumberWithDecimals(integer * -1, decimals)
 
-  const contractAddress = getContractAddress({ namespace: tokenSpec })
+  const contractAddress = getContractAddress({ namespace: tokenSpec } as KadenaTokenInterface)
 
   if (contractAddress.includes('poly-fungible-v2-reference')) {
     return [
@@ -73,7 +73,7 @@ export const getCapsForWithdraw = (
 export const getCapsForDeposit = (
   accountName: string,
   integer: number | string,
-  tokenSpec = { id: '' }
+  tokenSpec: NamespaceInterface
 ) => {
   const {
     OPACT_ACCOUNT_ID,
@@ -83,7 +83,7 @@ export const getCapsForDeposit = (
 
   const amount = formatBigNumberWithDecimals(integer, decimals)
 
-  const contractAddress = getContractAddress({ namespace: tokenSpec })
+  const contractAddress = getContractAddress({ namespace: tokenSpec } as KadenaTokenInterface)
 
   if (contractAddress.includes('poly-fungible-v2-reference')) {
     return [

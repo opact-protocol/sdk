@@ -2,10 +2,23 @@ import * as nacl from 'tweetnacl';
 import { HDKey } from "ethereum-cryptography/hdkey";
 import { toHex } from "ethereum-cryptography/utils";
 import { generateMnemonic, mnemonicToSeed } from './bip39'
+// eslint-disable-next-line import/no-cycle
 import { deriveBabyJubKeysFromEth } from './babyjub';
 import { combineHex } from '../util/hex';
 
-export const getWalletFromSeed = ({ seed }: { seed: Uint8Array }, mnemonic?: string) => {
+export interface WalletInterface {
+  hdkey: HDKey,
+  pubkey: string,
+  pvtkey: string,
+  address: string,
+  mnemonic: string,
+}
+
+export interface GetWalletFromSeedInterface {
+  seed: Uint8Array
+}
+
+export const getWalletFromSeed = ({ seed }: GetWalletFromSeedInterface, mnemonic?: string): WalletInterface => {
   const hdkey = HDKey.fromMasterSeed(seed);
 
   const address = getWalletAddress(hdkey)
@@ -18,17 +31,17 @@ export const getWalletFromSeed = ({ seed }: { seed: Uint8Array }, mnemonic?: str
     pubkey,
     pvtkey,
     address,
-    mnemonic,
+    mnemonic: mnemonic || '',
   }
 }
 
-export const getWalletFromMnemonic = (mnemonic: string): any => {
+export const getWalletFromMnemonic = (mnemonic: string): WalletInterface => {
   const seed = mnemonicToSeed(mnemonic)
 
   return getWalletFromSeed({ ...seed }, mnemonic)
 }
 
-export const getRandomWallet = (): any => {
+export const getRandomWallet = (): WalletInterface => {
   const mnemonic = generateMnemonic()
 
   const seed = mnemonicToSeed(mnemonic)
@@ -43,7 +56,7 @@ export const getWalletAddress = (hdkey: HDKey): string => {
 
   const pvtkey = `0x${toHex(hdkey.privateKey as Uint8Array)}`;
 
-  const derivedKeys = deriveBabyJubKeysFromEth({ pvtkey })
+  const derivedKeys = deriveBabyJubKeysFromEth({ pvtkey } as WalletInterface)
 
   return combineHex({
     derivedKeys,

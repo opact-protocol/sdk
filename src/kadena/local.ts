@@ -1,10 +1,10 @@
 import Pact from 'pact-lang-api'
-import { getConfig } from '../constants'
+import { KadenaTokenInterface, getConfig } from '../constants'
 import { getContractAddress } from '../util'
 
 export const getTokenDetails = async (
   accountName: string,
-  token: any
+  token: KadenaTokenInterface
 ) => {
   const {
     nodeUrl,

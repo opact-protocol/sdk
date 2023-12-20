@@ -1,6 +1,18 @@
 import { getDelta, getSolutionBatch, getSolutionBatchForNFT, getSolutionOuts } from "./solutions"
 import { deriveBabyJubKeysFromEth } from "../keys"
 import { separateHex } from "../util/hex"
+import { KadenaTokenInterface } from "../constants"
+import { ReceiptInterface } from "../receipts"
+
+export interface GetTransferSolutionBatchInterface {
+  treeBalance: any,
+  senderWallet: any,
+  receipts?: ReceiptInterface[],
+  receiverAddress?: string,
+  totalRequired: string | number | bigint,
+  excludedUTXOIDPositions?: any[],
+  selectedToken: KadenaTokenInterface,
+}
 
 export const getTransferSolutionBatch = async ({
   treeBalance,
@@ -10,10 +22,10 @@ export const getTransferSolutionBatch = async ({
   receiverAddress,
   receipts = [],
   excludedUTXOIDPositions = [],
-}: any) => {
+}: GetTransferSolutionBatchInterface) => {
   const {
     babyjubPubkey = '',
-  } = separateHex(receiverAddress)
+  } = separateHex(receiverAddress || '')
 
   const derivedKeys = deriveBabyJubKeysFromEth(senderWallet)
 
@@ -27,7 +39,6 @@ export const getTransferSolutionBatch = async ({
   const utxosOut = await getSolutionOuts({
     utxosIn,
     receipts,
-    treeBalance,
     selectedToken,
     totalRequired,
     receiverPubkey: babyjubPubkey,
@@ -43,6 +54,15 @@ export const getTransferSolutionBatch = async ({
   }
 }
 
+export interface GetTransferSolutionBatchForNFTInterface {
+  treeBalance: any,
+  senderWallet: any,
+  receipts?: ReceiptInterface[],
+  receiverAddress?: string,
+  totalRequired: string | number | bigint,
+  selectedToken: KadenaTokenInterface,
+}
+
 export const getTransferSolutionBatchForNFT = async ({
   treeBalance,
   senderWallet,
@@ -50,10 +70,10 @@ export const getTransferSolutionBatchForNFT = async ({
   totalRequired,
   receiverAddress,
   receipts = [],
-}: any) => {
+}: GetTransferSolutionBatchForNFTInterface) => {
   const {
     babyjubPubkey = '',
-  } = separateHex(receiverAddress)
+  } = separateHex(receiverAddress || '')
 
   const derivedKeys = deriveBabyJubKeysFromEth(senderWallet)
 
@@ -65,7 +85,6 @@ export const getTransferSolutionBatchForNFT = async ({
   const utxosOut = await getSolutionOuts({
     utxosIn,
     receipts,
-    treeBalance,
     selectedToken,
     totalRequired,
     receiverPubkey: babyjubPubkey,

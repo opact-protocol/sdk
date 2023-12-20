@@ -1,19 +1,21 @@
 import Pact from 'pact-lang-api'
 import { poseidon } from "circomlibjs"
 import { base64urlToBigInt } from "./string"
+import type { ExtDataInterface } from '../kadena/transaction'
+import { KadenaTokenInterface } from '../constants'
 
-export const getBlakeMessageHash = (extData: any) => {
-  return Pact.crypto.hash(`${extData.sender.toString() as string},${extData.recipient.toString() as string},${extData.tokenType as string},${extData.tokenAmount as string},${extData.tokenId as string},${extData.encryptedReceipts.join('') as string},${extData.encryptedCommitments.join('').toString() as string},${extData.outputCommitments.join('').toString() as string}`)
+export const getBlakeMessageHash = (extData: ExtDataInterface) => {
+  return Pact.crypto.hash(`${extData.sender.toString()},${extData.recipient.toString()},${extData.tokenType},${extData.tokenAmount},${extData.tokenId},${(extData.encryptedReceipts || []).join('')},${extData.encryptedCommitments.join('').toString()},${extData.outputCommitments.join('').toString()}`)
 }
 
-export const getPoseidonMessageHash = (extData: any) => {
+export const getPoseidonMessageHash = (extData: ExtDataInterface) => {
   const blakeHash = getBlakeMessageHash(extData)
 
   return poseidon([base64urlToBigInt(blakeHash)])
 }
 
-export const getBlakeTokenHash = ({ namespace }: any) => {
-  let preffix = namespace.refName.name === 'coin' ? 'coin' : `test.${namespace?.refName?.name as string}`
+export const getBlakeTokenHash = ({ namespace }: KadenaTokenInterface) => {
+  let preffix = namespace.refName.name === 'coin' ? 'coin' : `test.${namespace?.refName?.name}`
 
   if (namespace.refName.name === 'poly-fungible-v2-reference') {
     preffix = 'free.poly-fungible-v2-reference'
@@ -22,7 +24,7 @@ export const getBlakeTokenHash = ({ namespace }: any) => {
   return Pact.crypto.hash(preffix)
 }
 
-export const getPoseidonTokenHash = (selected: any) => {
+export const getPoseidonTokenHash = (selected: KadenaTokenInterface) => {
   const blakeHash = getBlakeTokenHash(selected)
 
   return poseidon([base64urlToBigInt(blakeHash)])

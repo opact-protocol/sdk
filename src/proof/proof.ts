@@ -1,9 +1,40 @@
 import { poseidon } from 'circomlibjs'
-import { deriveBabyJubKeysFromEth } from '../keys'
+import { WalletInterface, deriveBabyJubKeysFromEth } from '../keys'
 import { getNullifier, inUtxoInputs, outUtxoInputsNoHashed } from "../utxo"
+import { KadenaTokenInterface } from '../constants'
+
+export interface ProofInputsInterface {
+  root: bigint,
+  token: bigint,
+  delta: bigint,
+  secret: bigint,
+  message_hash: bigint,
+  secret_token: bigint,
+  subtree_root: bigint,
+
+  mp_path: bigint[],
+  nullifier: bigint[],
+  mp_sibling: bigint[],
+  utxo_in_data: bigint[],
+  utxo_out_hash: bigint[],
+  utxo_out_data: bigint[],
+  subtree_mp_sibling: bigint[],
+}
+
+export interface ComputeInputsInterface {
+  utxosIn: any[],
+  utxosOut: any[],
+  roots: {
+    tree: bigint | string,
+    subtree: bigint | string,
+  },
+  delta: string | bigint,
+  wallet: WalletInterface,
+  message: string | bigint,
+  selectedToken: KadenaTokenInterface
+}
 
 export const computeInputs = async ({
-  batch,
   roots,
   delta,
   wallet,
@@ -11,7 +42,7 @@ export const computeInputs = async ({
   utxosIn,
   utxosOut,
   selectedToken,
-}: any) => {
+}: ComputeInputsInterface) => {
   const token = BigInt(selectedToken.hash)
 
   const {

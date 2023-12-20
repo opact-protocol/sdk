@@ -2,7 +2,18 @@
 import { toHex } from 'ethereum-cryptography/utils';
 import * as bip39 from 'ethereum-cryptography/bip39';
 import { wordlist } from 'ethereum-cryptography/bip39/wordlists/english';
-import { MnemonicType, MnemonicStrengthType, MnemonicPasswordType } from './types/bip39.types';
+
+export type MnemonicType = string
+
+export type MnemonicPasswordType = string
+
+export type MnemonicStrengthType = 128 | 192 | 256
+
+export type KeyNode = {
+  chainKey: string;
+  chainCode: string;
+};
+
 
 export const generateMnemonic = (strength: MnemonicStrengthType = 128): string => bip39.generateMnemonic(wordlist, strength);
 

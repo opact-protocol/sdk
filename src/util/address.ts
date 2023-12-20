@@ -1,3 +1,5 @@
+import { KadenaTokenInterface } from "../constants"
+
 // shorten the checksummed version of the input address to have 4 characters at start and end
 export function shortenAddress (
   address: string,
@@ -8,7 +10,7 @@ export function shortenAddress (
   )}`
 }
 
-export const getContractAddress = ({ namespace }: any) => {
+export const getContractAddress = ({ namespace }: KadenaTokenInterface) => {
   const core = [
     namespace.refName.namespace,
     namespace.refName.name

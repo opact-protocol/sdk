@@ -3,7 +3,7 @@ import chai from 'chai';
 import seed from './stubs/seed.json'
 import wallet from './stubs/wallet.json'
 import babyjub from './stubs/babyjub.json'
-import { getWalletFromSeed } from '../wallet'
+import { WalletInterface, getWalletFromSeed } from '../wallet'
 import { generateMnemonic, mnemonicToSeed, validateMnemonic } from '../bip39';
 import { deriveBabyJubKeysFromEth } from '../babyjub';
 
@@ -32,7 +32,7 @@ describe('Key derivation tests', function test() {
     expect(pubkey).to.equal(`0x${wallet.pubkey}`);
     expect(pvtkey).to.equal(`0x${wallet.pvtkey}`);
 
-    const derivedKeys = deriveBabyJubKeysFromEth({ pvtkey })
+    const derivedKeys = deriveBabyJubKeysFromEth({ pvtkey } as WalletInterface)
 
     expect(derivedKeys.pubkey.toString()).to.equal(babyjub.pubkey);
     expect(derivedKeys.pvtkey.toString()).to.equal(babyjub.pvtkey);

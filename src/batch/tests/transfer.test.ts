@@ -165,7 +165,7 @@ describe('Transfer tests', function test() {
           namespace: 'kip'
         }
       }
-    }
+    } as any
 
     const treeBalance = {
       token: BigInt(selectedToken.hash),

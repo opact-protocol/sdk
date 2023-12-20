@@ -36,7 +36,6 @@ Here's a brief overview of the SDK structure:
 │   └── Batch           # The Batch module provides solutions for composing transactions related to withdrawals or deposits.
 │   └── Constants       # The Constants module includes essential utilities such as base token definitions, and constants for Merkle tree.
 │   └── Encryption      # The Encryption module offers solutions for encryption tasks, including functions for both decryption and encryption.
-│   └── Indexer         # The Indexer module provides solutions for managing data loaded by the indexer, grouping UTXOs into balances for each token type.
 │   └── Kadena          # The Kadena module: provides solutions for interacting with the Kadena blockchain like: creating deposit and withdrawal transactions
 │   └── Keys            # The Keys module offers key derivation solutions to generate wallets compatible with opact protocol
 │   └── Merkle-tree     # The Merkle Tree module provides solutions and services for constructing a valid Merkle tree by retrieving each leaf from the indexer

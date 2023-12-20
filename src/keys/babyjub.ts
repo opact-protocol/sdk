@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { babyjub } from 'circomlibjs';
 import { stripOZK } from '../util';
+import { WalletInterface } from './wallet';
 
 /**
  * TODO: Refact this function
@@ -48,13 +49,18 @@ export function subgroupDecompress(x: bigint | number): [bigint, bigint] {
   throw new Error("Not a compressed point at subgroup");
 }
 
-export const validatePubkey = (pubkey: bigint) => {
+export const validatePubkey = (pubkey: bigint): Boolean => {
   const decompressed = subgroupDecompress(pubkey)
 
   return babyjub.inCurve(decompressed)
 }
 
-export const deriveBabyJubKeysFromEth = (wallet: any) => {
+export interface DerivedWalletInterface {
+  pubkey: string,
+  pvtkey: bigint
+}
+
+export const deriveBabyJubKeysFromEth = (wallet: WalletInterface): DerivedWalletInterface => {
   const adjustedPrivateKey = BigInt(wallet.pvtkey) % babyjub.subOrder;
 
   const pubkey = babyjub.mulPointEscalar(babyjub.Base8, adjustedPrivateKey)[0];
