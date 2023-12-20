@@ -33,18 +33,22 @@ Here's a brief overview of the SDK structure:
 ├── .github
 │   └── CI              # CI Workflow: validate TS and check all tests 
 ├── src
-│   └── util            # Utils: -
-│   └── ticket          # Ticket abstractions: -
-│   └── merkletree      # Merkletree abstractions: -
-│   └── encryptation    # Encryptation abstractions: -
-│   └── key-derivation  # Key derivation abstractions: -
+│   └── Batch           # The Batch module provides solutions for composing transactions related to withdrawals or deposits.
+│   └── Constants       # The Constants module includes essential utilities such as base token definitions, and constants for Merkle tree.
+│   └── Encryption      # The Encryption module offers solutions for encryption tasks, including functions for both decryption and encryption.
+│   └── Indexer         # The Indexer module provides solutions for managing data loaded by the indexer, grouping UTXOs into balances for each token type.
+│   └── Kadena          # The Kadena module: provides solutions for interacting with the Kadena blockchain like: creating deposit and withdrawal transactions
+│   └── Keys            # The Keys module offers key derivation solutions to generate wallets compatible with opact protocol
+│   └── Merkle-tree     # The Merkle Tree module provides solutions and services for constructing a valid Merkle tree by retrieving each leaf from the indexer
+│   └── Proof           # The Proof module provides solutions to assist in generating proofs for the Opact circuit
+│   └── Receipts        # The Receipts module: offers solutions for the creation and encryption of receipts
+│   └── Storage         # The Storage module provides services for managing cached data, such as persisting wallet login or caching UTXOs
+│   └── Utxo            # The UTXO module provides solutions for creating UTXOs essential for utilizing the Opact protocol
 ├── package.json
 ```
 
 ## Installation
 Opact Protocol is powered by [**Hack-a-chain**](https://hackachain.io/).
-
-If you have any problems configuring your enviroment, remember to read the [Nuxt Documentation](https://nuxt.com/docs).
 
 -----------------
 
@@ -65,4 +69,7 @@ $ cp ./front/.env.example ./front/.env
 $ pnpm install
 ```
 
-When working on frontend, run `pnpm front dev`. Files will be compiled, concatenated and the browser will auto update.
+3) Run tests
+```bash
+$ pnpm test
+```
