@@ -1,8 +1,22 @@
 let ENV: string | undefined = '';
 
+export interface AppConfigInterface {
+  key: string,
+  name: string,
+  chainId: string
+  website: string,
+  nodeUrl: string,
+  networkId: string,
+  indexerUrl: string,
+  OPACT_ACCOUNT_ID: string,
+  OPACT_CONTRACT_ID: string,
+  OPACT_GAS_PAYER_ID: string,
+  OPACT_CONTRACT_NAMESPACE: string,
+}
+
 export function getConfig(
   env: string | undefined = ENV || process.env.OPACT_SDK_NETWORK
-) {
+): AppConfigInterface {
   ENV = env;
   switch (env) {
     case 'kadena-mainnet':

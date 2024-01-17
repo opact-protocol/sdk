@@ -1,35 +1,66 @@
 import { poseidon } from 'circomlibjs'
 import { toHex } from 'ethereum-cryptography/utils';
 import { getRandomBytesSync } from 'ethereum-cryptography/random';
-import { TXO } from './types/utxo.type';
 import { encrypt } from '../encryption';
 import { separateHex } from '../util/hex';
+import { ReceiptInterface } from '../receipts';
 
-export const getRandomBlinding = () => BigInt(`0x${toHex(getRandomBytesSync(32))}`)
+export interface UtxoInterface {
+  hash: bigint,
+  token: bigint,
+  amount: bigint,
+  pubkey: bigint,
+  address: string,
+  blinding: bigint,
+  id: string | number,
+  receipt?: null | ReceiptInterface
+}
 
-export const ownerCommit = ({ pubkey, blinding }: any) => poseidon([pubkey, blinding]);
+export const getRandomBlinding = (): bigint => BigInt(`0x${toHex(getRandomBytesSync(32))}`)
 
-export const getNullifier = ({ utxo, secret }: any) => poseidon([secret, utxoHash(utxo)])
+export const ownerCommit = ({ pubkey, blinding }: UtxoInterface): bigint => poseidon([pubkey, blinding]);
 
-export const inUtxoInputs = ({ token, amount, blinding }: any) => [token, amount, blinding];
+export interface GetNullifierInterface {
+  utxo: UtxoInterface,
+  secret: bigint
+}
 
-export const utxoHash = ({ token, amount, pubkey, blinding }: TXO) => outUtxoInputs({ token, amount, pubkey, blinding })
+export const getNullifier = ({ utxo, secret }: GetNullifierInterface): bigint => poseidon([secret, utxoHash(utxo)])
 
-export const outUtxoInputs = ({ token, amount, pubkey, blinding }: any) => poseidon([token, amount, ownerCommit({pubkey, blinding})]);
+export const inUtxoInputs = ({ token, amount, blinding }: UtxoInterface): bigint[] => [token, amount, blinding];
 
-export const objUtxoInputs = ({ token, amount, pubkey, blinding }: any) => ({
+export const utxoHash = ({ token, amount, pubkey, blinding }: UtxoInterface): bigint => outUtxoInputs({ token, amount, pubkey, blinding } as UtxoInterface)
+
+export const outUtxoInputs = ({ token, amount, pubkey, blinding }: UtxoInterface): bigint => poseidon([token, amount, ownerCommit({ pubkey, blinding } as UtxoInterface)]);
+
+export interface ObjUtxoInputsInterface {
+  token: bigint,
+  amount: bigint,
+  owner_commit: bigint
+}
+
+export const objUtxoInputs = ({ token, amount, pubkey, blinding }: UtxoInterface): ObjUtxoInputsInterface => ({
   token,
   amount,
-  owner_commit: ownerCommit({ pubkey, blinding }),
+  owner_commit: ownerCommit({ pubkey, blinding } as UtxoInterface),
 })
 
-export const outUtxoInputsNoHashed = ({ blinding, token, amount, pubkey }: any) => {
+export const outUtxoInputsNoHashed = ({ blinding, token, amount, pubkey }: UtxoInterface): bigint[] => {
   const owner = ownerCommit({
     blinding,
     pubkey,
-  })
+  } as UtxoInterface)
 
   return [BigInt(token), BigInt(amount), BigInt(owner)]
+}
+
+export interface GetUtxoInterface {
+  token: string | bigint,
+  pubkey: string | bigint,
+  id?: string | number,
+  address?: string,
+  amount?: bigint | number,
+  receipt?: ReceiptInterface | null,
 }
 
 export const getUtxo = ({
@@ -39,13 +70,13 @@ export const getUtxo = ({
   amount = 0n,
   receipt = null,
   address = 'coin',
-}: any): any => {
+}: GetUtxoInterface): UtxoInterface => {
   const blinding = getRandomBlinding()
 
   const core =  {
-    amount,
     blinding,
     token: BigInt(token),
+    amount: BigInt(amount),
     pubkey: BigInt(pubkey),
   }
 
@@ -60,11 +91,17 @@ export const getUtxo = ({
   };
 };
 
+export interface GetEncryptedUtxosOfTransactionInterface {
+  batch: any,
+  senderAddress: string,
+  receiverAddress?: string,
+}
+
 export const getEncryptedUtxosOfTransaction = ({
   batch,
   senderAddress,
   receiverAddress,
-}: any) => {
+}: GetEncryptedUtxosOfTransactionInterface): string[] => {
   const {
     babyjubPubkey: senderPubkey,
   } = separateHex(senderAddress);
@@ -72,7 +109,7 @@ export const getEncryptedUtxosOfTransaction = ({
   return batch.utxosOut.map((utxo: any) => {
     const address = utxo.pubkey === BigInt(senderPubkey)
       ? senderAddress
-      : receiverAddress
+      : (receiverAddress || '')
 
     return encrypt({
       address,

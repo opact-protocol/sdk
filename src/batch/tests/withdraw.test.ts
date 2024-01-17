@@ -8,7 +8,7 @@ import { getRandomWallet } from '../../keys';
 import { separateHex } from '../../util/hex';
 import { MerkleTreeService } from '../../merkle-tree';
 import { computeInputs } from '../../proof';
-import { kadenaTokens as kadenaBaseTokens } from '../../constants';
+import { KadenaTokenInterface, kadenaTokens as kadenaBaseTokens } from '../../constants';
 import { getEncryptedReceiptsOfTransaction } from '../../receipts';
 import { getKdaMessage, getKdaTransactionParams } from '../../kadena';
 import { getTransferSolutionBatch, getTransferSolutionBatchForNFT } from '../transfer';
@@ -163,7 +163,7 @@ describe('Withdraw tests', function test() {
           namespace: 'kip'
         }
       }
-    }
+    } as any
 
     const treeBalance = {
       token: BigInt(selectedToken.hash),

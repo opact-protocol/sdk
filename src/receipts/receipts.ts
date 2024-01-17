@@ -1,4 +1,23 @@
+import { KadenaTokenInterface } from "../constants"
 import { encrypt } from "../encryption"
+
+export interface GetReceiptsOfTransactionInterface {
+  senderAddress: string,
+  receiverAddress: string,
+  amount: string | bigint | number,
+  selectedToken: KadenaTokenInterface
+  type: 'deposit' | 'withdraw' | 'transfer',
+}
+
+export interface ReceiptInterface {
+  date: number,
+  amount: string,
+  sender: string,
+  address: string,
+  receiver: string,
+  id: string | number,
+  type: 'deposit' | 'withdraw',
+}
 
 export const getReceiptsOfTransaction = ({
   type,
@@ -6,7 +25,7 @@ export const getReceiptsOfTransaction = ({
   selectedToken,
   senderAddress,
   receiverAddress,
-}: any) => {
+}: GetReceiptsOfTransactionInterface): ReceiptInterface[] => {
   const {
     id,
     address,
@@ -68,7 +87,7 @@ export const getEncryptedReceiptsOfTransaction = ({
   selectedToken,
   senderAddress,
   receiverAddress,
-}: any) => {
+}: GetReceiptsOfTransactionInterface): string[] => {
   const receipts = getReceiptsOfTransaction({
     type,
     amount,

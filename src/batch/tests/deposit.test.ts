@@ -148,7 +148,7 @@ describe('Deposit tests', function test() {
           namespace: 'kip'
         }
       }
-    }
+    } as any
 
     const batch = await getDepositSoluctionBatch({
       selectedToken,

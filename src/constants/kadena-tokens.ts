@@ -1,4 +1,26 @@
-export const kadenaTokens = [
+export interface NamespaceInterface {
+  id: string,
+  refName: {
+    name: string,
+    namespace: string
+  },
+  refSpec: {
+    name: string,
+    namespace: string
+  }
+}
+
+export interface KadenaTokenInterface {
+  hash: string,
+  icon: string,
+  name : string,
+  symbol: string,
+  address: string,
+  id: number | string,
+  namespace: NamespaceInterface
+}
+
+export const kadenaTokens: KadenaTokenInterface[] = [
   {
     id: 0,
     symbol: 'KDA',
