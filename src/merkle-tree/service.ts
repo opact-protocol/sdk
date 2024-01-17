@@ -1,10 +1,15 @@
 import { MerkleTree } from 'fixed-merkle-tree'
 import { treeHash } from '../util/poseidon';
 import { MerkleTree as RawTree } from './tree';
-import { MerkleTreeServiceInterface } from './types/tree.types';
 import { emptyElement, subtreeExpectedValue, treeHeight } from '../constants/tree';
 import request, { gql } from 'graphql-request';
 import { getConfig } from '../constants';
+
+export interface MerkleTreeServiceInterface {
+  dbUrl: string,
+  chainId: number,
+  instanceName: string,
+}
 
 export class MerkleTreeService {
   readonly dbUrl: string;

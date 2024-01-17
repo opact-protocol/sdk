@@ -1,12 +1,18 @@
 import { getContractAddress } from "../util"
+import type { ExtDataInterface } from "./transaction"
 
 export const opactTransactCode = "(free.opact.transact (read-msg 'proof) (read-msg 'extData))"
+
+export interface GetTransactionCodeInterface {
+  proof: any
+  extData: ExtDataInterface
+}
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 export const getTransactionCode = ({
   proof,
   extData
-}: any) => {
+}: GetTransactionCodeInterface) => {
   return `(free.opact.transact {
       "public_values":[${proof.public_values.join(' ')}],
       "a":{"x": ${proof.a.x}, "y": ${proof.a.y} },
@@ -23,7 +29,7 @@ export const getTransactionCode = ({
       "outputCommitments": [${extData.outputCommitments.join(
         ' '
       )}],
-      "encryptedReceipts": ["${extData.encryptedReceipts.join(
+      "encryptedReceipts": ["${(extData.encryptedReceipts || []).join(
         '" "'
       )}"],
       "encryptedCommitments": ["${extData.encryptedCommitments.join(

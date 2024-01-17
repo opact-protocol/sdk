@@ -1,7 +1,12 @@
 import { decrypt as _decrypt } from '@metamask/eth-sig-util';
 import { decode } from 'js-base64';
-import { DecryptInterface } from './types/decrypt.type';
 import { parseUtxoString, strip0x } from '../util';
+
+export interface DecryptInterface {
+  privateKey: string;
+  encrypted: string;
+  isUtxo?: boolean
+}
 
 export const decrypt = ({ encrypted, privateKey, isUtxo = true }: DecryptInterface) => {
   const decodedEncrypted = decode(encrypted)
