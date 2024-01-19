@@ -1,5 +1,4 @@
 
-import Pact from 'pact-lang-api'
 import { KadenaTokenInterface, NamespaceInterface, getConfig } from '../constants'
 import { formatBigNumberWithDecimals, getContractAddress, getDecimals } from '../util'
 
@@ -22,51 +21,59 @@ export const getCapsForWithdraw = (
 
   if (contractAddress.includes('poly-fungible-v2-reference')) {
     return [
-      Pact.lang.mkCap(
-        'Mint Token',
-        'Capability to mint token',
-        `${contractAddress}.TRANSFER`,
-        [
-          tokenSpec?.id || '',
-          OPACT_ACCOUNT_ID,
-          receiver,
-          Number((amount))
-        ]
-      ),
-      Pact.lang.mkCap(
-        'Coin Transfer for Gas',
-        'Capability to transfer gas fee from signer to gas payer',
-        'coin.TRANSFER',
-        [
-          accountName,
-          OPACT_GAS_PAYER_ID,
-          Number((1).toFixed(1))
-        ]
-      )
+      {
+        role: "Mint Token",
+        description: "Capability to mint token",
+        cap: {
+          name: `${contractAddress}.TRANSFER`,
+          args: [
+            tokenSpec?.id || '',
+            OPACT_ACCOUNT_ID,
+            receiver,
+            Number((amount))
+          ]
+        }
+      },
+      {
+        role: "Coin Transfer for Gas",
+        description: "Capability to transfer gas fee from signer to gas payer",
+        cap: {
+          name: "coin.TRANSFER",
+          args: [
+            accountName,
+            OPACT_GAS_PAYER_ID,
+            Number((1).toFixed(1))
+          ]
+        }
+      },
     ]
   }
 
   return [
-    Pact.lang.mkCap(
-      'Coin Transfer',
-      'Capability to transfer designated amount of coin from sender to receiver',
-      `${contractAddress}.TRANSFER`,
-      [
-        OPACT_ACCOUNT_ID,
-        receiver,
-        Number((amount))
-      ]
-    ),
-    Pact.lang.mkCap(
-      'Coin Transfer for Gas',
-      'Capability to transfer gas fee from signer to gas payer',
-      'coin.TRANSFER',
-      [
-        accountName,
-        OPACT_GAS_PAYER_ID,
-        Number((1).toFixed(1))
-      ]
-    )
+    {
+      role: "Coin Transfer",
+      description: "Capability to transfer designated amount of coin from sender to receiver",
+      cap: {
+        name: `${contractAddress}.TRANSFER`,
+        args: [
+          OPACT_ACCOUNT_ID,
+          receiver,
+          Number((amount))
+        ]
+      }
+    },
+    {
+      role: "Coin Transfer for Gas",
+      description: "Capability to transfer gas fee from signer to gas payer",
+      cap: {
+        name: 'coin.TRANSFER',
+        args: [
+          accountName,
+          OPACT_GAS_PAYER_ID,
+          Number((1).toFixed(1))
+        ]
+      }
+    },
   ]
 }
 
@@ -87,36 +94,44 @@ export const getCapsForDeposit = (
 
   if (contractAddress.includes('poly-fungible-v2-reference')) {
     return [
-      Pact.lang.mkCap(
-        'Mint Token',
-        'Capability to mint token',
-        `${contractAddress}.TRANSFER`,
-        [
-          tokenSpec.id,
-          accountName,
-          OPACT_ACCOUNT_ID,
-          Number(amount)
-        ]
-      )
+      {
+        role: "Mint Token",
+        description: "Capability to mint token",
+        cap: {
+          name: `${contractAddress}.TRANSFER`,
+          args: [
+            tokenSpec.id,
+            accountName,
+            OPACT_ACCOUNT_ID,
+            Number(amount)
+          ]
+        }
+      },
     ]
   }
 
   return [
-    Pact.lang.mkCap(
-      'Coin Gas',
-      'Capability to pay Gas',
-      'coin.GAS',
-      []
-    ),
-    Pact.lang.mkCap(
-      'Coin Transfer',
-      'Capability to transfer designated amount of coin from sender to receiver',
-      `${contractAddress}.TRANSFER`,
-      [
-        accountName,
-        OPACT_ACCOUNT_ID,
-        Number(amount)
-      ]
-    )
+    {
+      role: "Coin Gas",
+      description: "Capability to pay Gas",
+      cap: {
+        name: "coin.GAS",
+        args: [
+          //
+        ]
+      }
+    },
+    {
+      role: "Coin Transfer",
+      description: "Capability to transfer designated amount of coin from sender to receiver",
+      cap: {
+        name: `${contractAddress}.TRANSFER`,
+        args: [
+          accountName,
+          OPACT_ACCOUNT_ID,
+          Number(amount)
+        ]
+      }
+    },
   ]
 }

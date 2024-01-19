@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-import PactApi from 'pact-lang-api'
 import { genKeyPair, sign } from '@kadena/cryptography-utils';
 import { PactNumber } from '@kadena/pactjs'
 import { Pact, createClient, isSignedTransaction } from '@kadena/client';
@@ -118,24 +116,30 @@ export const getPartialOpactCommand = ({
     })
 }
 
-export const sendSigned = async (cmd: any) => {
+export const sendSigned = async (transaction: any): Promise<any> => {
   const {
     nodeUrl,
   } = getConfig()
 
-  const tx = await PactApi.wallet.sendSigned(
-    cmd.signedCmd,
-    nodeUrl
-  )
+  const { submit, pollStatus } = createClient(nodeUrl);
 
-  const { result } = await PactApi.fetch.listen(
-    { listen: tx.requestKeys[0] },
-    nodeUrl
-  )
+  if (!isSignedTransaction(transaction)) {
+    throw new Error('Transaction is not signed');
+  }
+
+  const requestKeys = await submit(transaction) as any;
+
+  const {
+    [requestKeys.requestKey]: {
+      result
+    }
+  } = await pollStatus(requestKeys);
 
   if (result.status === 'failure') {
-    throw new Error(result.error.message)
+    throw new Error((result.error as any).message)
   }
+
+  console.log('status', result)
 
   return result
 }
@@ -206,31 +210,7 @@ export const sendOZKTransaction = async (
 
   transaction.sigs = [{ sig: signature.sig }];
 
-  const { submit, pollStatus } = createClient(
-    'https://api.testnet.chainweb.com/chainweb/0.0/testnet04/chain/0/pact'
-  );
-
   callbackProgress('Awaiting TX results...')
 
-  if (!isSignedTransaction(transaction)) {
-    throw new Error('Transaction is not signed');
-  }
-
-  const requestKeys = await submit(transaction) as any;
-
-  console.log('requestKeys[0]', requestKeys)
-
-  const {
-    [requestKeys.requestKey]: {
-      result
-    }
-  } = await pollStatus(requestKeys);
-
-  if (result.status === 'failure') {
-    throw new Error((result.error as any).message)
-  }
-
-  console.log('status', result)
-
-  return result
+  return await sendSigned(transaction)
 }

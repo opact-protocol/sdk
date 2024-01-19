@@ -1,6 +1,6 @@
-import Pact from 'pact-lang-api'
-import { KadenaTokenInterface, getConfig } from '../constants'
+import { Pact, createClient } from '@kadena/client'
 import { getContractAddress } from '../util'
+import { KadenaTokenInterface, getConfig } from '../constants'
 
 export const getTokenDetails = async (
   accountName: string,
@@ -9,30 +9,31 @@ export const getTokenDetails = async (
   const {
     nodeUrl,
     chainId,
-  } = getConfig()
+    networkId,
+  } = getConfig() as any
 
   const contractAddress = getContractAddress(token)
 
-  const {
-    result: { status, data }
-  } = await Pact.fetch.local(
-    {
-      pactCode: `(${contractAddress}.details "${accountName}")`,
-      meta: {
-        creationTime: Math.round(new Date().getTime() / 1000) - 10,
-        ttl: 600,
-        chainId,
-        gasLimit: 600,
-        gasPrice: 0.0000001,
-        sender: '',
-      },
-    },
-    nodeUrl
-  )
+  const { local } = createClient(nodeUrl);
 
-  if (status === 'failure') {
-    throw new Error(data)
+  const transaction = Pact.builder
+    .execution(`(${contractAddress}.details "${accountName}")`)
+    .setMeta({
+      chainId,
+    })
+    .setNetworkId(networkId)
+    .createTransaction();
+
+  const {
+    result
+  } = await local(transaction, {
+    preflight: false,
+    signatureVerification: false,
+  }) as any;
+
+  if (result.status === 'failure') {
+    throw new Error(result.error)
   }
 
-  return data
+  return result.data
 }

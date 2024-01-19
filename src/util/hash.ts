@@ -1,11 +1,11 @@
-import Pact from 'pact-lang-api'
 import { poseidon } from "circomlibjs"
 import { base64urlToBigInt } from "./string"
+import { hash } from '@kadena/cryptography-utils'
 import type { ExtDataInterface } from '../kadena/transaction'
 import { KadenaTokenInterface } from '../constants'
 
 export const getBlakeMessageHash = (extData: ExtDataInterface) => {
-  return Pact.crypto.hash(`${extData.sender.toString()},${extData.recipient.toString()},${extData.tokenType},${extData.tokenAmount},${extData.tokenId},${(extData.encryptedReceipts || []).join('')},${extData.encryptedCommitments.join('').toString()},${extData.outputCommitments.join('').toString()}`)
+  return hash(`${extData.sender.toString()},${extData.recipient.toString()},${extData.tokenType},${extData.tokenAmount},${extData.tokenId},${(extData.encryptedReceipts || []).join('')},${extData.encryptedCommitments.join('').toString()},${extData.outputCommitments.join('').toString()}`)
 }
 
 export const getPoseidonMessageHash = (extData: ExtDataInterface) => {
@@ -21,7 +21,7 @@ export const getBlakeTokenHash = ({ namespace }: KadenaTokenInterface) => {
     preffix = 'free.poly-fungible-v2-reference'
   }
 
-  return Pact.crypto.hash(preffix)
+  return hash(preffix)
 }
 
 export const getPoseidonTokenHash = (selected: KadenaTokenInterface) => {
