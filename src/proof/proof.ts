@@ -2,6 +2,28 @@ import { poseidon } from 'circomlibjs'
 import { WalletInterface, deriveBabyJubKeysFromEth } from '../keys'
 import { getNullifier, inUtxoInputs, outUtxoInputsNoHashed } from "../utxo"
 import { KadenaTokenInterface } from '../constants'
+import { getPublicArgs } from './public-values'
+
+let snarkjs: any = null
+
+export const getProof = async (inputs: any) => {
+  if (!snarkjs) {
+    snarkjs = await import('snarkjs')
+  }
+
+  if (!snarkjs.groth16) {
+    throw new Error('groth not installed')
+  }
+
+  const { proof, publicSignals } =
+    await snarkjs.groth16.fullProve(
+      inputs,
+      '/transaction.wasm',
+      '/transaction_0001.zkey'
+    )
+
+  return getPublicArgs(proof, publicSignals)
+}
 
 export interface ProofInputsInterface {
   root: bigint,

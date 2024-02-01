@@ -1,6 +1,6 @@
 import { hash } from '@kadena/cryptography-utils'
 import { getPoseidonMessageHash } from '../util'
-import { ExtDataInterface } from './transaction'
+import { ExtDataInterface } from './command'
 
 export const blake = (value: any): string => hash(JSON.stringify(value)) as string
 

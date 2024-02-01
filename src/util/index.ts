@@ -1,4 +1,5 @@
 export * from './hex'
+export * from './ecko'
 export * from './hash'
 export * from './string'
 export * from './number'

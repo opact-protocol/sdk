@@ -1,7 +1,7 @@
 import { poseidon } from "circomlibjs"
 import { base64urlToBigInt } from "./string"
 import { hash } from '@kadena/cryptography-utils'
-import type { ExtDataInterface } from '../kadena/transaction'
+import type { ExtDataInterface } from '../kadena/command'
 import { KadenaTokenInterface } from '../constants'
 
 export const getBlakeMessageHash = (extData: ExtDataInterface) => {
