@@ -1,4 +1,5 @@
 
+import { PactNumber } from '@kadena/pactjs'
 import { KadenaTokenInterface, NamespaceInterface, getConfig } from '../constants'
 import { formatBigNumberWithDecimals, getContractAddress, getDecimals } from '../util'
 
@@ -19,6 +20,7 @@ export const getCapsForWithdraw = (
 
   const contractAddress = getContractAddress({ namespace: tokenSpec } as KadenaTokenInterface)
 
+  // TODO: delete this
   if (contractAddress.includes('poly-fungible-v2-reference')) {
     return [
       {
@@ -30,7 +32,7 @@ export const getCapsForWithdraw = (
             tokenSpec?.id || '',
             OPACT_ACCOUNT_ID,
             receiver,
-            Number((amount))
+            Number(amount)
           ]
         }
       },
@@ -42,7 +44,7 @@ export const getCapsForWithdraw = (
           args: [
             accountName,
             OPACT_GAS_PAYER_ID,
-            Number((1).toFixed(1))
+            new PactNumber(amount).toPactDecimal(),
           ]
         }
       },
@@ -58,7 +60,7 @@ export const getCapsForWithdraw = (
         args: [
           OPACT_ACCOUNT_ID,
           receiver,
-          Number((amount))
+          Number(amount)
         ]
       }
     },
@@ -70,7 +72,7 @@ export const getCapsForWithdraw = (
         args: [
           accountName,
           OPACT_GAS_PAYER_ID,
-          Number((1).toFixed(1))
+          new PactNumber(1).toPactDecimal(),
         ]
       }
     },
