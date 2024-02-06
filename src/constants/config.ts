@@ -1,5 +1,3 @@
-let ENV: string | undefined = '';
-
 export interface AppConfigInterface {
   key: string,
   name: string,
@@ -13,6 +11,8 @@ export interface AppConfigInterface {
   OPACT_GAS_PAYER_ID: string,
   OPACT_CONTRACT_NAMESPACE: string,
 }
+
+let ENV: string | undefined = '';
 
 export function getConfig(
   env: string | undefined = ENV || process.env.OPACT_SDK_NETWORK
