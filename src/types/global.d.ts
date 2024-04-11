@@ -4,7 +4,7 @@ declare module 'optimisedmt' {
   export function OptimisedMT(): any
 }
 
-declare module 'circomlibjs' {
+declare module '@railgun-community/circomlibjs' {
   export function poseidon(inputs: bigint[]): bigint;
   export const babyjub: any
 }

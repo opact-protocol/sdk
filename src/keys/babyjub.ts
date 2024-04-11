@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { babyjub } from 'circomlibjs';
+import { babyjub } from '@railgun-community/circomlibjs';
 import { stripOZK } from '../util';
 import { WalletInterface } from './wallet';
 

@@ -1,4 +1,4 @@
-import { poseidon } from "circomlibjs"
+import { poseidon } from "@railgun-community/circomlibjs"
 import { base64urlToBigInt } from "./string"
 import { hash } from '@kadena/cryptography-utils'
 import type { ExtDataInterface } from '../kadena/command'

@@ -1,4 +1,4 @@
-import { poseidon } from 'circomlibjs'
+import { poseidon } from '@railgun-community/circomlibjs'
 import { toHex } from 'ethereum-cryptography/utils';
 import { getRandomBytesSync } from 'ethereum-cryptography/random';
 import { encrypt } from '../encryption';

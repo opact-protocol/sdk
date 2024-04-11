@@ -1,7 +1,7 @@
 /* eslint-disable */
 // @ts-nocheck
 import assert from "assert";
-import { poseidon } from "circomlibjs";
+import { poseidon } from "@railgun-community/circomlibjs";
 
 const maxheight = 256;
 

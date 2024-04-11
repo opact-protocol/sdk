@@ -1,4 +1,4 @@
-import { poseidon } from 'circomlibjs'
+import { poseidon } from '@railgun-community/circomlibjs'
 import { WalletInterface, deriveBabyJubKeysFromEth } from '../keys'
 import { getNullifier, inUtxoInputs, outUtxoInputsNoHashed } from "../utxo"
 import { KadenaTokenInterface } from '../constants'

@@ -1,4 +1,4 @@
-import { poseidon } from "circomlibjs";
+import { poseidon } from "@railgun-community/circomlibjs";
 
 type IntoBigInt = string | number | bigint | boolean;
 
